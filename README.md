@@ -10,10 +10,10 @@ In this project, we are implementing a parser for a language similar to Python u
 
 ## Members
 
-1. Isaac Sexe (aka. Member 1)
-2. Ryan Kramer (aka. Member 2)
+1. Isaac Sexe (aka. isexe)
+2. Ryan Kramer (aka. monkey2987)
 3. Devin Hackman (aka. Member 3)
-4. Manas Katta (aka. Member 4)
+4. Manas Katta (aka. ManasKatta)
 
 ## Programming Language
 
