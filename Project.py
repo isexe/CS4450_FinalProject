@@ -9,7 +9,9 @@ class HelloPrintListener(ProjectListener):
         print("Hello: %s" % ctx.ID())
 
 def main():
-    lexer = ProjectLexer(StdinStream())
+    input = StdinStream()
+
+    lexer = ProjectLexer(input)
     stream = CommonTokenStream(lexer)
     parser = ProjectParser(stream)
     
