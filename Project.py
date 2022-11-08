@@ -1,8 +1,8 @@
 import sys
 from antlr4 import *
-from out.ProjectLexer import ProjectLexer
-from out.ProjectParser import ProjectParser
-from out.ProjectListener import ProjectListener
+from Grammer.ProjectLexer import ProjectLexer
+from Grammer.ProjectParser import ProjectParser
+from Grammer.ProjectListener import ProjectListener
 
 class HelloPrintListener(ProjectListener):
     def enterHi(self, ctx):
