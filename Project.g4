@@ -1,4 +1,13 @@
 grammar Project;
-hi : 'hello' ID ;
-ID : [a-z]+ ;
-WS : [ \t\r\n]+ -> skip ;
+
+hi 
+    : 'hello' ID
+    ;
+
+ID
+    : [A-Za-z]+
+    ;
+
+WS 
+    : [ \t\r\n]+ -> skip 
+    ;
