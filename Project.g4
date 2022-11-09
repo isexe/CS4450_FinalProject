@@ -4,40 +4,40 @@ grammar Project;
 // follows OOP concepts
 // import OtherGrammer;
 
-// need to represent math expression beyond just 1 + 1
-// i.e. (1 + 2) * 3
-// TODO change NUM to all datatypes i.e. 'a' + 'b' should be 'ab'
-expression  // reads left to right, top to bottom, so ordering needs to follow PEMDAS (maybe)
-    : '(' expression ')'
-    | left=expression operator=('*' | '/' | '%') right=expression
-    | left=expression operator=('+' | '-') right=expression
+// parser rule for arithmetic
+// reads left to right, top to bottom, so ordering needs to follow PEMDAS (maybe)
+// TODO fix bug with addition and subtraction not working when no space is present
+expression
+    : '(' expr=expression ')'
+    | left=expression operator=EXPON right=expression
+    | left=expression operator=(MULT | DIV | MOD) right=expression
+    | left=expression operator=(ADD | SUB) right=expression
     | terminal=ATOM
     ;
 
+// rules used in the expression parse rule
+// all the different math operators
+EXPON : '**' ;
+MULT : '*' ;
+DIV : '/' ;
+MOD : '%' ;
+ADD : '+' ;
+SUB : '-' ;
+
+// rule for defining datatypes
 ATOM
     : NUM
-    ;
-    
-NUM : [0-9]+ ('.' [0-9]*)? ;
-
-
-// Focus on one at a time
-/* 
-// TODO change value = NUM to all datatypes
-// TODO need to add other assignment operators
-assignment
-    : name=VAR operator='=' value=NUM
+    | CHAR
     ;
 
-// generic number format must allow for digits 0-9 as well as decimal points
-// TODO implement signed num
+//TODO currently this breaks the addition and subtraction if there isn't a space
+// rule for signed decimal numbers
+NUM : ('+' | '-')? [0-9]+ ('.' [0-9]*)? ;
 
-// Variable naming conventions
-// Must start with letter or _
-// can continue with letters, numbers, or _
-VAR 
-    : [A-Za-z_][0-9A-Za-z_]*
-    ;
-*/
+// TODO need to include much more than this
+CHAR : ([A-Za-z] | [0-9])+;
+
+// follow python naming conventions
+VAR : [A-Za-z_][0-9A-Za-z_]* ;
 
 WS : [ \t\r\n]+ -> skip ;
