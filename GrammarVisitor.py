@@ -7,13 +7,18 @@ from Grammar.ProjectVisitor import ProjectVisitor
 class GrammarVisitor(ProjectVisitor):
     
     def visitExpression(self, ctx: ProjectParser.ExpressionContext):
-        # used for debugging
-        print("Visit Expression: " + str(ctx.getText()))
+        if(ctx == None):
+            return None
+
+        # used for debugging/printing tree
+        tab = '    '
+        tab = (ctx.depth()-1) * tab
+        print(tab + str(ctx.getText()))
 
         #placeholders
-        l_val = 0
-        r_val = 0
-        val = 0
+        l_val = None
+        r_val = None
+        val = None
 
         # main difference between listener and visitor is visitor must invoke visit to continue
         
@@ -22,13 +27,13 @@ class GrammarVisitor(ProjectVisitor):
             val = self.visitExpression(ctx.expr)
 
         # explore nodes
-        if(ctx.left != None):
-            l_val = self.visitExpression(ctx.left)
-        if(ctx.right != None):
-            r_val = self.visitExpression(ctx.right)
+        l_val = self.visitExpression(ctx.left)
+        r_val = self.visitExpression(ctx.right)
 
         # calculate this value
-        if(ctx.MULT()):
+        if(ctx.EXPON()):
+            val = l_val ** r_val
+        elif(ctx.MULT()):
             val = l_val * r_val
         elif(ctx.DIV()):
             val = l_val / r_val
@@ -39,11 +44,32 @@ class GrammarVisitor(ProjectVisitor):
         elif(ctx.SUB()):
             val = l_val - r_val
         elif(ctx.ATOM()):
-            val = int(str(ctx.ATOM()))
+            # if at terminal convert ATOM to valid value
+            val = str(ctx.ATOM())
+            if(isValidInt(val)):
+                val = int(val)
+            elif(isValidFloat(val)):
+                val = float(val)
+            else:
+                val = str(val)
         else:
             # shouldn't get into this statement, unless it's parenthesis
             if(ctx.expr == None):
-                print("Issue with visit if checks")
+                print("ERROR: Visit didn't match any expected value.")
 
         # return the value from this node
         return val
+
+def isValidInt(string: str):
+    try:
+        int(string)
+        return True
+    except:
+        return False
+
+def isValidFloat(string: str):
+    try:
+        float(string)
+        return True
+    except:
+        return False
