@@ -14,10 +14,5 @@ class ProjectVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ProjectParser#assignment.
-    def visitAssignment(self, ctx:ProjectParser.AssignmentContext):
-        return self.visitChildren(ctx)
-
-
 
 del ProjectParser

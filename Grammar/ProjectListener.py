@@ -17,12 +17,3 @@ class ProjectListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ProjectParser#assignment.
-    def enterAssignment(self, ctx:ProjectParser.AssignmentContext):
-        pass
-
-    # Exit a parse tree produced by ProjectParser#assignment.
-    def exitAssignment(self, ctx:ProjectParser.AssignmentContext):
-        pass
-
-
