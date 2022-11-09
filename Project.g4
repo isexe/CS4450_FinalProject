@@ -11,22 +11,26 @@ expression  // reads left to right, top to bottom, so ordering needs to follow P
     : '(' expression ')'
     | left=expression operator=('*' | '/' | '%') right=expression
     | left=expression operator=('+' | '-') right=expression
-    | value=NUM
+    | terminal=ATOM
     ;
 
+ATOM
+    : NUM
+    ;
+    
+NUM : [0-9]+ ('.' [0-9]*)? ;
+
+
+// Focus on one at a time
+/* 
 // TODO change value = NUM to all datatypes
 // TODO need to add other assignment operators
 assignment
     : name=VAR operator='=' value=NUM
     ;
-    
+
 // generic number format must allow for digits 0-9 as well as decimal points
 // TODO implement signed num
-NUM
-    : [0-9]+.[0-9]+
-    ;
-
-
 
 // Variable naming conventions
 // Must start with letter or _
@@ -34,7 +38,6 @@ NUM
 VAR 
     : [A-Za-z_][0-9A-Za-z_]*
     ;
+*/
 
-WS
-    : [ \t\r\n]+ -> skip
-    ;
+WS : [ \t\r\n]+ -> skip ;
