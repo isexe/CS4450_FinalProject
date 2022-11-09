@@ -9,9 +9,13 @@ class HelloPrintListener(ProjectListener):
         print("Hello: %s" % ctx.ID())
 
 def main():
-    input = StdinStream()
+    # command-line formatting
+    print("pȳthon 0.0.1")
+    print("Type Ctrl+D to run, Ctrl+Z to exit")
+    usr_input = StdinStream(input('>>> '))
 
-    lexer = ProjectLexer(input)
+    # actual useful stuff
+    lexer = ProjectLexer(usr_input)
     stream = CommonTokenStream(lexer)
     parser = ProjectParser(stream)
     
