@@ -7,7 +7,7 @@ grammar Project;
 // need to represent math expression beyond just 1 + 1
 // i.e. (1 + 2) * 3
 // TODO change NUM to all datatypes i.e. 'a' + 'b' should be 'ab'
-expression  // reads left to right, top to bottom, so ordering needs to follow PEMDAS
+expression  // reads left to right, top to bottom, so ordering needs to follow PEMDAS (maybe)
     : '(' expression ')'
     | left=expression operator=('*' | '/' | '%') right=expression
     | left=expression operator=('+' | '-') right=expression
