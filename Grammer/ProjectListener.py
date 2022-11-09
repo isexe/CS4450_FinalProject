@@ -8,12 +8,21 @@ else:
 # This class defines a complete listener for a parse tree produced by ProjectParser.
 class ProjectListener(ParseTreeListener):
 
-    # Enter a parse tree produced by ProjectParser#hi.
-    def enterHi(self, ctx:ProjectParser.HiContext):
+    # Enter a parse tree produced by ProjectParser#expression.
+    def enterExpression(self, ctx:ProjectParser.ExpressionContext):
         pass
 
-    # Exit a parse tree produced by ProjectParser#hi.
-    def exitHi(self, ctx:ProjectParser.HiContext):
+    # Exit a parse tree produced by ProjectParser#expression.
+    def exitExpression(self, ctx:ProjectParser.ExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by ProjectParser#assignment.
+    def enterAssignment(self, ctx:ProjectParser.AssignmentContext):
+        pass
+
+    # Exit a parse tree produced by ProjectParser#assignment.
+    def exitAssignment(self, ctx:ProjectParser.AssignmentContext):
         pass
 
 
