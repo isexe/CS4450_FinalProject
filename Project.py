@@ -31,16 +31,12 @@ def main():
     # parse and get tree
     tree = parser.expression()
     
-
-    
-    
     # use visitor to traverse parse tree
-    print("\n--- Visitor ---")
+    print("\n--- Visitor Tree ---")
     result = GrammarVisitor().visitExpression(tree)
     
-    print("\n--- OUTPUT ---")
+    print("\n--- Results ---")
     print(tree.toStringTree())
-    print(tree.getText())
     print(result)
 
     # currently using Visitor as I found that was easier to work with
