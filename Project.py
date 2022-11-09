@@ -2,27 +2,17 @@ import sys
 from antlr4 import *
 from Grammar.ProjectLexer import ProjectLexer
 from Grammar.ProjectParser import ProjectParser
-from Grammar.ProjectListener import ProjectListener
-from Grammar.ProjectVisitor import ProjectVisitor
+from GrammarListener import GrammarListener
+from GrammarVisitor import GrammarVisitor
+
+# *Resource for tree visualization - not image so not useful
+# https://treelib.readthedocs.io/en/latest/
+# from treelib import Node, Tree
 
 # *Resource for understanding Listener VS Visitor
 # https://tomassetti.me/listeners-and-visitors/
 #* Resouce for general help
 # https://tomassetti.me/antlr-mega-tutorial/#chapter11
-
-class GrammarListener(ProjectListener):
-    def enterExpression(self, ctx: ProjectParser.ExpressionContext):
-        print("Enter Expression: " + ctx.getText())
-
-    def exitExpression(self, ctx: ProjectParser.ExpressionContext):
-        print("Exit Expression: " + ctx.getText())
-        
-    def visitTerminal(self, node: TerminalNode):
-        print("Visit Terminal: " + str(node))
-
-class GrammarVisitor(ProjectVisitor):
-    def visitExpression(self, ctx: ProjectParser.ExpressionContext):
-        pass
 
 def main():
     # command-line formatting
@@ -31,25 +21,35 @@ def main():
     usr_input = StdinStream()
     
     # parse input
-    # ordering is lexer -> stream -> parser
+    # ordering is lexer -> token stream -> parser
     lexer = ProjectLexer(usr_input)
     stream = CommonTokenStream(lexer)
     parser = ProjectParser(stream)
     # pretty sure is redundant but better save than sorry
     parser.buildParseTrees = True
-    
-    # Get tree from parser
+
+    # parse and get tree
     tree = parser.expression()
+    
 
-    # Use listener to traverse parse tree
-    listener = GrammarListener()
-    walker = ParseTreeWalker()
-    print("\n--- Traversing Tree ---")
-    walker.walk(listener, tree)
-
+    
+    
+    # use visitor to traverse parse tree
+    print("\n--- Visitor ---")
+    result = GrammarVisitor().visitExpression(tree)
+    
     print("\n--- OUTPUT ---")
     print(tree.toStringTree())
     print(tree.getText())
+    print(result)
+
+    # currently using Visitor as I found that was easier to work with
+    # # Use listener to traverse parse tree
+    # # mainly used for debugging currently
+    # print("\n--- Listener ---")
+    # listener = GrammarListener()
+    # walker = ParseTreeWalker()
+    # walker.walk(listener, tree)
 
 if __name__ == '__main__':
     main()
