@@ -1,25 +1,25 @@
-# Generated from Project.g4 by ANTLR 4.7.2
+# Generated from Project.g4 by ANTLR 4.11.1
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
-from typing.io import TextIO
 import sys
+if sys.version_info[1] > 5:
+	from typing import TextIO
+else:
+	from typing.io import TextIO
 
 def serializedATN():
-    with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\17")
-        buf.write("\33\4\2\t\2\3\2\3\2\3\2\3\2\3\2\3\2\5\2\13\n\2\3\2\3\2")
-        buf.write("\3\2\3\2\3\2\3\2\3\2\3\2\3\2\7\2\26\n\2\f\2\16\2\31\13")
-        buf.write("\2\3\2\2\3\2\3\2\2\4\3\2\6\b\3\2\t\n\2\35\2\n\3\2\2\2")
-        buf.write("\4\5\b\2\1\2\5\6\7\3\2\2\6\7\5\2\2\2\7\b\7\4\2\2\b\13")
-        buf.write("\3\2\2\2\t\13\7\13\2\2\n\4\3\2\2\2\n\t\3\2\2\2\13\27\3")
-        buf.write("\2\2\2\f\r\f\6\2\2\r\16\7\5\2\2\16\26\5\2\2\7\17\20\f")
-        buf.write("\5\2\2\20\21\t\2\2\2\21\26\5\2\2\6\22\23\f\4\2\2\23\24")
-        buf.write("\t\3\2\2\24\26\5\2\2\5\25\f\3\2\2\2\25\17\3\2\2\2\25\22")
-        buf.write("\3\2\2\2\26\31\3\2\2\2\27\25\3\2\2\2\27\30\3\2\2\2\30")
-        buf.write("\3\3\2\2\2\31\27\3\2\2\2\5\n\25\27")
-        return buf.getvalue()
-
+    return [
+        4,1,13,25,2,0,7,0,1,0,1,0,1,0,1,0,1,0,1,0,3,0,9,8,0,1,0,1,0,1,0,
+        1,0,1,0,1,0,1,0,1,0,1,0,5,0,20,8,0,10,0,12,0,23,9,0,1,0,0,1,0,1,
+        0,0,2,1,0,4,6,1,0,7,8,27,0,8,1,0,0,0,2,3,6,0,-1,0,3,4,5,1,0,0,4,
+        5,3,0,0,0,5,6,5,2,0,0,6,9,1,0,0,0,7,9,5,9,0,0,8,2,1,0,0,0,8,7,1,
+        0,0,0,9,21,1,0,0,0,10,11,10,4,0,0,11,12,5,3,0,0,12,20,3,0,0,5,13,
+        14,10,3,0,0,14,15,7,0,0,0,15,20,3,0,0,4,16,17,10,2,0,0,17,18,7,1,
+        0,0,18,20,3,0,0,3,19,10,1,0,0,0,19,13,1,0,0,0,19,16,1,0,0,0,20,23,
+        1,0,0,0,21,19,1,0,0,0,21,22,1,0,0,0,22,1,1,0,0,0,23,21,1,0,0,0,3,
+        8,19,21
+    ]
 
 class ProjectParser ( Parser ):
 
@@ -59,13 +59,15 @@ class ProjectParser ( Parser ):
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        self.checkVersion("4.7.2")
+        self.checkVersion("4.11.1")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
 
 
 
+
     class ExpressionContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -136,7 +138,7 @@ class ProjectParser ( Parser ):
             self.state = 8
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [ProjectParser.T__0]:
+            if token in [1]:
                 self.state = 3
                 self.match(ProjectParser.T__0)
                 self.state = 4
@@ -144,7 +146,7 @@ class ProjectParser ( Parser ):
                 self.state = 5
                 self.match(ProjectParser.T__1)
                 pass
-            elif token in [ProjectParser.ATOM]:
+            elif token in [9]:
                 self.state = 7
                 localctx.terminal = self.match(ProjectParser.ATOM)
                 pass
@@ -188,7 +190,7 @@ class ProjectParser ( Parser ):
                         self.state = 14
                         localctx.operator = self._input.LT(1)
                         _la = self._input.LA(1)
-                        if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << ProjectParser.MULT) | (1 << ProjectParser.DIV) | (1 << ProjectParser.MOD))) != 0)):
+                        if not(((_la) & ~0x3f) == 0 and ((1 << _la) & 112) != 0):
                             localctx.operator = self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
@@ -208,7 +210,7 @@ class ProjectParser ( Parser ):
                         self.state = 17
                         localctx.operator = self._input.LT(1)
                         _la = self._input.LA(1)
-                        if not(_la==ProjectParser.ADD or _la==ProjectParser.SUB):
+                        if not(_la==7 or _la==8):
                             localctx.operator = self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)

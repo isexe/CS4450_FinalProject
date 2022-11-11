@@ -1,4 +1,4 @@
-# Generated from Project.g4 by ANTLR 4.7.2
+# Generated from Project.g4 by ANTLR 4.11.1
 from antlr4 import *
 if __name__ is not None and "." in __name__:
     from .ProjectParser import ProjectParser
@@ -17,3 +17,5 @@ class ProjectListener(ParseTreeListener):
         pass
 
 
+
+del ProjectParser
