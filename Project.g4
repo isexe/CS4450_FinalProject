@@ -7,6 +7,19 @@ grammar Project;
 // parser rule for arithmetic
 // reads left to right, top to bottom, so ordering needs to follow PEMDAS (maybe)
 // TODO fix bug with addition and subtraction not working when no space is present
+
+assign
+    : left=id operator=EQU right=expression
+    | left=id operator=PLU_EQU right=expression
+    | left=id operator=MIN_EQU right=expression
+    | left=id operator=MULT_equ right=expression
+    | left=id operator=DIV_EQU right=expression
+    ;
+
+id 
+    : terminal=ATOM
+    ;
+
 expression
     : '(' expr=expression ')'
     | left=expression operator=EXPON right=expression
@@ -23,6 +36,14 @@ DIV : '/' ;
 MOD : '%' ;
 ADD : '+' ;
 SUB : '-' ;
+
+// rules used in the assign parse rule
+// all the different assignment operators
+EQU : '=' ;
+PLU_EQU : '+=' ;
+MIN_EQU : '-=' ;
+MULT_equ : '*=' ;
+DIV_EQU : '/=' ;
 
 // rule for defining datatypes
 ATOM
