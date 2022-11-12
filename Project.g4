@@ -18,11 +18,11 @@ statement
     ;
 
 assign
-    : left=id operator=EQU right=expression
-    | left=id operator=PLU_EQU right=expression
-    | left=id operator=MIN_EQU right=expression
-    | left=id operator=MULT_EQU right=expression
-    | left=id operator=DIV_EQU right=expression
+    : left=id operator=EQU right=equation
+    | left=id operator=PLU_EQU right=equation
+    | left=id operator=MIN_EQU right=equation
+    | left=id operator=MULT_EQU right=equation
+    | left=id operator=DIV_EQU right=equation
     ;
 
 id 
@@ -31,6 +31,7 @@ id
 
 // grows one way to fix ambiguity
 // no longer left recursion
+// may need to invert the precedence ?
 equation: factor (expon factor)* ;
 
 factor: sum ((mult | div | mod) sum)* ;
@@ -76,14 +77,21 @@ ATOM
     | CHAR
     ;
 
-//TODO currently this breaks the addition and subtraction if there isn't a space
+// TODO currently this breaks the addition and subtraction if there isn't a space
 // rule for signed decimal numbers
 NUM : ('+' | '-')? [0-9]+ ('.' [0-9]*)? ;
 
 // TODO need to include much more than this
-CHAR : ([A-Za-z] | [0-9])+;
+CHAR : QUOTES ([A-Za-z] | [0-9])+ QUOTES;
+
+QUOTES : '"' ;
 
 // follow python naming conventions
 VAR : [A-Za-z_][0-9A-Za-z_]* ;
 
-WS : [ \t\r\n]+ -> skip ;
+EOL : [\n\r]+ ;
+
+// skip for now but tabs are important for scope later on
+TAB : [\t] -> skip;
+
+WS : [ ]+ -> skip ;
