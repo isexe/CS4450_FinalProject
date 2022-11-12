@@ -8,11 +8,20 @@ grammar Project;
 // reads left to right, top to bottom, so ordering needs to follow PEMDAS (maybe)
 // TODO fix bug with addition and subtraction not working when no space is present
 
+code : lines* EOF ;
+
+lines : statement EOL ;
+
+statement 
+    : equation
+    | assign
+    ;
+
 assign
     : left=id operator=EQU right=expression
     | left=id operator=PLU_EQU right=expression
     | left=id operator=MIN_EQU right=expression
-    | left=id operator=MULT_equ right=expression
+    | left=id operator=MULT_EQU right=expression
     | left=id operator=DIV_EQU right=expression
     ;
 
@@ -20,30 +29,45 @@ id
     : terminal=VAR
     ;
 
-expression
-    : '(' expr=expression ')'
-    | left=expression operator=EXPON right=expression
-    | left=expression operator=(MULT | DIV | MOD) right=expression
-    | left=expression operator=(ADD | SUB) right=expression
-    | terminal=ATOM
-    | terminal=VAR
-    ;
+// grows one way to fix ambiguity
+// no longer left recursion
+equation: factor (expon factor)* ;
 
-// rules used in the expression parse rule
+factor: sum ((mult | div | mod) sum)* ;
+
+sum: val ((add | sub) val)* ;
+
+val
+    : '(' equation ')'
+    | VAR
+    | ATOM;
+
+// BAD ambigous and left/right repeating
+// expression
+//    : '(' expr=expression ')'
+//    | left=expression operator=EXPON right=expression
+//    | left=expression operator=(MULT | DIV | MOD) right=expression
+//    | left=expression operator=(ADD | SUB) right=expression
+//    | terminal=(ATOM | VAR)
+//    ;
+
+// parser rules used in the equation parse rule
 // all the different math operators
-EXPON : '**' ;
-MULT : '*' ;
-DIV : '/' ;
-MOD : '%' ;
-ADD : '+' ;
-SUB : '-' ;
+// believe parser rules have higher precedence than lexer rules
+// hopefully this fixes issues with positive values
+expon : '**' ;
+mult : '*' ;
+div : '/' ;
+mod : '%' ;
+add : '+' ;
+sub : '-' ;
 
 // rules used in the assign parse rule
 // all the different assignment operators
 EQU : '=' ;
 PLU_EQU : '+=' ;
 MIN_EQU : '-=' ;
-MULT_equ : '*=' ;
+MULT_EQU : '*=' ;
 DIV_EQU : '/=' ;
 
 // rule for defining datatypes
