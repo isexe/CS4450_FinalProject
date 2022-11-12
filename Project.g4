@@ -17,7 +17,7 @@ assign
     ;
 
 id 
-    : terminal=ATOM
+    : terminal=VAR
     ;
 
 expression
@@ -26,6 +26,7 @@ expression
     | left=expression operator=(MULT | DIV | MOD) right=expression
     | left=expression operator=(ADD | SUB) right=expression
     | terminal=ATOM
+    | terminal=VAR
     ;
 
 // rules used in the expression parse rule
