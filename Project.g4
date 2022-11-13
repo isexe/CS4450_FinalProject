@@ -1,56 +1,52 @@
 grammar Project;
 
-// Might want to break apart grammer into others for organization
-// follows OOP concepts
-// import OtherGrammer;
 
-// parser rule for arithmetic
-// reads left to right, top to bottom, so ordering needs to follow PEMDAS (maybe)
-// TODO fix bug with addition and subtraction not working when no space is present
-
+// compile all the code
 code : lines* EOF ;
 
+// each line of code
 lines : statement EOL ;
 
+// all the parse rules that need to be followed
 statement 
     : equation
     | assign
     ;
 
 assign
-    : left=id operator=EQU right=equation
-    | left=id operator=PLU_EQU right=equation
-    | left=id operator=MIN_EQU right=equation
-    | left=id operator=MULT_EQU right=equation
-    | left=id operator=DIV_EQU right=equation
+    : id eq equation         #assignment
+    | id eq_add equation     #addition_assignment
+    | id eq_sub equation     #subtraction_assignment
+    | id eq_mult equation    #multiplication_assignment
+    | id eq_div equation     #division_assignment
     ;
 
-id 
-    : terminal=VAR
-    ;
+id : VAR ;
 
-// grows one way to fix ambiguity
-// no longer left recursion
-// may need to invert the precedence ?
-equation: factor (expon factor)* ;
+// rules used in the assign parse rule
+// all the different assignment operators
+eq : '=' ;
+eq_add : '+=' ;
+eq_sub : '-=' ;
+eq_mult : '*=' ;
+eq_div : '/=' ;
 
-factor: sum ((mult | div | mod) sum)* ;
+// Arithmetic rule
+// grows one way to fix ambiguity rather than both to fix
+// changed lexer rules to parse rules
+// broke apart into seperate rules for neatness and more control
+// Depth First Search so important at bottom
+// parser rule for arithmetic
+equation : factor ((add | sub) factor)* ;
 
-sum: val ((add | sub) val)* ;
+factor : exponent ((mult | div | mod) exponent)* ;
+
+exponent : ATOM (expon ATOM)* ;
 
 val
     : '(' equation ')'
     | VAR
     | ATOM;
-
-// BAD ambigous and left/right repeating
-// expression
-//    : '(' expr=expression ')'
-//    | left=expression operator=EXPON right=expression
-//    | left=expression operator=(MULT | DIV | MOD) right=expression
-//    | left=expression operator=(ADD | SUB) right=expression
-//    | terminal=(ATOM | VAR)
-//    ;
 
 // parser rules used in the equation parse rule
 // all the different math operators
@@ -63,13 +59,22 @@ mod : '%' ;
 add : '+' ;
 sub : '-' ;
 
-// rules used in the assign parse rule
-// all the different assignment operators
-EQU : '=' ;
-PLU_EQU : '+=' ;
-MIN_EQU : '-=' ;
-MULT_EQU : '*=' ;
-DIV_EQU : '/=' ;
+//! DEPRECIATED
+//BAD ambigous and left/right repeating
+expression
+   : '(' expr=expression ')'
+   | left=expression operator=EXPON right=expression
+   | left=expression operator=(MULT | DIV | MOD) right=expression
+   | left=expression operator=(ADD | SUB) right=expression
+   | terminal=(ATOM | VAR)
+   ;
+
+EXPON : '**' ;
+MULT : '*' ;
+DIV : '/' ;
+MOD : '%' ;
+ADD : '+' ;
+SUB : '-' ;
 
 // rule for defining datatypes
 ATOM
@@ -79,12 +84,23 @@ ATOM
 
 // TODO currently this breaks the addition and subtraction if there isn't a space
 // rule for signed decimal numbers
-NUM : ('+' | '-')? [0-9]+ ('.' [0-9]*)? ;
+// requires num before . so need to add option for no num but forced decimal
+// now 0.0, 0., and .0 are all valid
+NUM 
+    : ('+' | '-')? DECIMAL;
+
+// real numbers
+DECIMAL 
+    : DIGIT+ ('.' DIGIT*)?
+    | (DIGIT* '.')? DIGIT+;
+
+// 1 digit numbers
+DIGIT : [0-9];
 
 // TODO need to include much more than this
 CHAR : QUOTES ([A-Za-z] | [0-9])+ QUOTES;
 
-QUOTES : '"' ;
+QUOTES : '"' | '\'';
 
 // follow python naming conventions
 VAR : [A-Za-z_][0-9A-Za-z_]* ;

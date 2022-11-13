@@ -1,7 +1,6 @@
 from antlr4 import *
 from Grammar.ProjectLexer import ProjectLexer
 from Grammar.ProjectParser import ProjectParser
-from Grammar.ProjectListener import ProjectListener
 from Grammar.ProjectVisitor import ProjectVisitor
 
 class GrammarVisitor(ProjectVisitor):

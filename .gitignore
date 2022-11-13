@@ -3,3 +3,7 @@
 
 # Ignore files for testing
 *test*
+
+# Ignore Folders
+Grammar/
+Java/
