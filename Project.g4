@@ -13,38 +13,41 @@ statement
     | assign
     ;
 
+//parser rule for assignment
 assign
-    : id eq equation         #assignment
-    | id eq_add equation     #addition_assignment
-    | id eq_sub equation     #subtraction_assignment
-    | id eq_mult equation    #multiplication_assignment
-    | id eq_div equation     #division_assignment
+    : left=id operator=EQU right=equation
+    | left=id operator=PLU_EQU right=equation
+    | left=id operator=MIN_EQU right=equation
+    | left=id operator=MULT_equ right=equation
+    | left=id operator=DIV_EQU right=equation
     ;
 
+// parser rule
 id : VAR ;
 
-// rules used in the assign parse rule
+// lexer rules used in the assign parse rule
 // all the different assignment operators
-eq : '=' ;
-eq_add : '+=' ;
-eq_sub : '-=' ;
-eq_mult : '*=' ;
-eq_div : '/=' ;
+EQU : '=' ;
+PLU_EQU : '+=' ;
+MIN_EQU : '-=' ;
+MULT_equ : '*=' ;
+DIV_EQU : '/=' ;
+
 
 // Arithmetic rule
-// grows one way to fix ambiguity rather than both to fix
+// grows one way rather than both to fix ambiguity
 // changed lexer rules to parse rules
 // broke apart into seperate rules for neatness and more control
 // Depth First Search so important at bottom
 // parser rule for arithmetic
-equation : factor ((add | sub) factor)* ;
+equation : sum;
 
-factor : exponent ((mult | div | mod) exponent)* ;
+sum : factor ((add | sub) factor)* ;
 
-exponent : ATOM (expon ATOM)* ;
+factor : val ((mult | div | mod) val)* ;
 
 val
-    : '(' equation ')'
+    : '(' sum ')'
     | VAR
     | ATOM;
 
@@ -52,7 +55,6 @@ val
 // all the different math operators
 // believe parser rules have higher precedence than lexer rules
 // hopefully this fixes issues with positive values
-expon : '**' ;
 mult : '*' ;
 div : '/' ;
 mod : '%' ;
@@ -60,21 +62,21 @@ add : '+' ;
 sub : '-' ;
 
 //! DEPRECIATED
-//BAD ambigous and left/right repeating
-expression
-   : '(' expr=expression ')'
-   | left=expression operator=EXPON right=expression
-   | left=expression operator=(MULT | DIV | MOD) right=expression
-   | left=expression operator=(ADD | SUB) right=expression
-   | terminal=(ATOM | VAR)
-   ;
+//BAD ambigous and left/right recursion
+// expression
+//    : '(' expr=expression ')'
+//    | left=expression operator=EXPON right=expression
+//    | left=expression operator=(MULT | DIV | MOD) right=expression
+//    | left=expression operator=(ADD | SUB) right=expression
+//    | terminal=(ATOM | VAR)
+//    ;
 
-EXPON : '**' ;
-MULT : '*' ;
-DIV : '/' ;
-MOD : '%' ;
-ADD : '+' ;
-SUB : '-' ;
+// EXPON : '**' ;
+// MULT : '*' ;
+// DIV : '/' ;
+// MOD : '%' ;
+// ADD : '+' ;
+// SUB : '-' ;
 
 // rule for defining datatypes
 ATOM
@@ -107,7 +109,7 @@ VAR : [A-Za-z_][0-9A-Za-z_]* ;
 
 EOL : [\n\r]+ ;
 
-// skip for now but tabs are important for scope later on
+// not impemented yet but tabs are used for scope not WS
 TAB : [\t] -> skip;
 
 WS : [ ]+ -> skip ;
