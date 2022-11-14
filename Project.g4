@@ -4,6 +4,20 @@ grammar Project;
 // follows OOP concepts
 // import OtherGrammer;
 
+// compile all the code
+
+code : lines* EOF ;
+
+// each line of code
+lines : statement EOL ;
+
+// all the parse rules that need to be followed
+statement 
+    : equation
+    | assign
+    ;
+
+
 // parser rule for arithmetic
 // reads left to right, top to bottom, so ordering needs to follow PEMDAS (maybe)
 // TODO fix bug with addition and subtraction not working when no space is present
@@ -62,4 +76,9 @@ CHAR : ([A-Za-z] | [0-9])+;
 // follow python naming conventions
 VAR : [A-Za-z_][0-9A-Za-z_]* ;
 
-WS : [ \t\r\n]+ -> skip ;
+EOL : [\n\r]+ ;
+
+// not impemented yet but tabs are used for scope not WS
+TAB : [\t] -> skip;
+
+WS : [ ]+ -> skip ;
