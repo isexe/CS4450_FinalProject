@@ -32,7 +32,7 @@ def main():
     tree = parser.code()
     
     # use visitor to traverse parse tree
-    result = GrammarVisitor().visitCode(tree)
+    result = GrammarVisitor(debugging=True).visitCode(tree)
     
     print("\n--- String Parse Tree ---")
     print(tree.toStringTree())

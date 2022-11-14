@@ -15,11 +15,17 @@ statement
 
 //parser rule for assignment
 assign
-    : left=id operator=EQU right=equation
-    | left=id operator=PLU_EQU right=equation
-    | left=id operator=MIN_EQU right=equation
-    | left=id operator=MULT_equ right=equation
-    | left=id operator=DIV_EQU right=equation
+    : left=id operator=EQU right=assign_val
+    | left=id operator=PLU_EQU right=assign_val
+    | left=id operator=MIN_EQU right=assign_val
+    | left=id operator=MULT_equ right=assign_val
+    | left=id operator=DIV_EQU right=assign_val
+    ;
+
+assign_val
+    : VAR
+    | ATOM
+    | equation
     ;
 
 // parser rule
@@ -40,16 +46,18 @@ DIV_EQU : '/=' ;
 // broke apart into seperate rules for neatness and more control
 // Depth First Search so important at bottom
 // parser rule for arithmetic
-equation : sum;
+equation : sum ;
 
+// redundant but more readable in here and py code
 sum : factor ((add | sub) factor)* ;
 
 factor : val ((mult | div | mod) val)* ;
 
 val
     : '(' sum ')'
+    | ATOM
     | VAR
-    | ATOM;
+    ;
 
 // parser rules used in the equation parse rule
 // all the different math operators
@@ -88,19 +96,20 @@ ATOM
 // rule for signed decimal numbers
 // requires num before . so need to add option for no num but forced decimal
 // now 0.0, 0., and .0 are all valid
-NUM 
-    : ('+' | '-')? DECIMAL;
+NUM : ('+' | '-')? DECIMAL ;
 
 // real numbers
+// works with 0.0 .0 and 0.
 DECIMAL 
     : DIGIT+ ('.' DIGIT*)?
-    | (DIGIT* '.')? DIGIT+;
+    | (DIGIT* '.')? DIGIT+
+    ;
 
 // 1 digit numbers
-DIGIT : [0-9];
+DIGIT : [0-9] ;
 
 // TODO need to include much more than this
-CHAR : QUOTES ([A-Za-z] | [0-9])+ QUOTES;
+CHAR : QUOTES ([A-Za-z] | [0-9] | WS | TAB | EOL)+ QUOTES;
 
 QUOTES : '"' | '\'';
 

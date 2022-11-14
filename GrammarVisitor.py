@@ -6,6 +6,8 @@ from Grammar.ProjectVisitor import ProjectVisitor
 from Visitors.EquationVisitor import EquationVisitor
 
 class GrammarVisitor(ProjectVisitor):
+    def __init__(self, debugging = False):
+        self.debugging = debugging
     
     # Visit a parse tree produced by ProjectParser#code.
     # Next Node is Lines
@@ -30,5 +32,7 @@ class GrammarVisitor(ProjectVisitor):
         result = EquationVisitor().visitEquation(ctx)
 
         # used to debug
-        # print("Equation: " + ctx.getText() + " = " + str(result))
+        if(self.debugging):
+            print("Equation:\n" + ctx.getText() + " = " + str(result))
+
         return result
