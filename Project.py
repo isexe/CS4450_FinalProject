@@ -29,7 +29,7 @@ def main():
     parser.buildParseTrees = True
 
     # parse and get tree
-    tree = parser.expression()
+    tree = parser.code()
     
     # use visitor to traverse parse tree
     print("\n--- Visitor Tree ---")
