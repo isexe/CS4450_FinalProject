@@ -33,7 +33,7 @@ def main():
     
     # use visitor to traverse parse tree
     print("\n--- Visitor Tree ---")
-    result = GrammarVisitor().visitExpression(tree)
+    result = GrammarVisitor().visit(tree)
     
     print("\n--- Results ---")
     print(tree.toStringTree())
