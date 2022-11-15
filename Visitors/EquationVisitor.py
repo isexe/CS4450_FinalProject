@@ -120,7 +120,8 @@ class EquationVisitor(ProjectVisitor):
     def visitVal(self, ctx:ProjectParser.ValContext):
         # is variable
         if(ctx.VAR()):
-            pass
+            # TODO
+            UnexpectedError("ctx.VAR() has not been implemented in equation")
         # is atom value
         elif(ctx.ATOM()):
             return ctx.ATOM()
