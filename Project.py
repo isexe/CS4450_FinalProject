@@ -2,7 +2,6 @@ import sys
 from antlr4 import *
 from Grammar.ProjectLexer import ProjectLexer
 from Grammar.ProjectParser import ProjectParser
-from GrammarListener import GrammarListener
 from GrammarVisitor import GrammarVisitor
 
 # *Resource for tree visualization - not image so not useful
