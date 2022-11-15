@@ -80,8 +80,7 @@ class GrammarVisitor(ProjectVisitor):
         val = None
         l_val = self.visitId(ctx.left)
 
-        def visitId(ctx):
-            return ctx.VAR()
+        
 
         r_val = self.visitExpression(ctx.right)
 
@@ -91,24 +90,29 @@ class GrammarVisitor(ProjectVisitor):
             #create variable and insert into dict where key = l_val
             sampleDict[str(l_val)] = { "Address" : "", "Value" : "", "Type" : "", "Lifetime" : "", "Scope" : ""}
 
-        def visitAssign_val():
-            if(ctx.VAR()):
-                assign_val = sampleDict[ctx.VAR()]
-                #if not found raise Error
-                return assign_val
-            elif(ctx.ATOM()):
-                val = str(ctx.ATOM())
-                if(isValidInt(val)):
-                    val = int(val)
-                elif(isValidFloat(val)):
-                    val = float(val)
-                else:
-                    val = str(val)
-            elif(ctx.equation != None):
-                return EquationVisitor.visitEquation(ctx.equation)
-                #print("need to find and import eq visitor, will need to pull from github")
+
+    def visitId(self, ctx: ProjectParser.EquationContext):
+        return ctx.VAR()
+    
+    
+    def visitAssign_val(self, ctx: ProjectParser.EquationContext):
+        if(ctx.VAR()):
+            assign_val = sampleDict[ctx.VAR()]
+            #if not found raise Error
+            return assign_val
+        elif(ctx.ATOM()):
+            val = str(ctx.ATOM())
+            if(isValidInt(val)):
+                val = int(val)
+            elif(isValidFloat(val)):
+                val = float(val)
             else:
-                print("something is very wrong")
+                val = str(val)
+        elif(ctx.equation != None):
+            return EquationVisitor.visitEquation(ctx.equation)
+            #print("need to find and import eq visitor, will need to pull from github")
+        else:
+            print("something is very wrong")
         
         #ill implement this later
         # if r_val is variable 
