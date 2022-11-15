@@ -65,21 +65,31 @@ class GrammarVisitor(ProjectVisitor):
         # main difference between listener and visitor is visitor must invoke visit to continue
             
         # check for nested expression
-        if(ctx.expr != None):
-            val = self.visitExpression(ctx.expr)
+        """if(ctx != None):
+            val = self.visitExpression(ctx)
         
         val = None
-        l_val = self.visitId(ctx.left)
+        l_val = self.visitId(ctx)"""
 
-        
-
-        r_val = self.visitExpression(ctx.right)
+        r_val = self.visitAssign_val(r_val)
 
         if l_val in sampleDict: 
             val = sampleDict[l_val]
         else:
             #create variable and insert into dict where key = l_val
-            sampleDict[str(l_val)] = { "Address" : "", "Value" : "", "Type" : "", "Lifetime" : "", "Scope" : ""}
+            if r_val == None :
+                value_type = "None"
+            if isValidInt(r_val):
+                value_type = "Int"
+            elif isValidFloat(r_val):
+                value_type = "Float"
+            elif isValidBool(r_val): 
+                value_type = "Bool"
+            else:
+                value_type = "String"
+
+            sampleDict[str(l_val)] = { "Address" : "", "Value" : r_val, "Type" : value_type, "Lifetime" : "", "Scope" : ""}
+            print(sampleDict[str(l_val)])
 
 
     def visitId(self, ctx: ProjectParser.EquationContext):
@@ -87,6 +97,8 @@ class GrammarVisitor(ProjectVisitor):
     
     
     def visitAssign_val(self, ctx: ProjectParser.EquationContext):
+        if(ctx == None):
+            return ctx
         if(ctx.VAR()):
             assign_val = sampleDict[ctx.VAR()]
             #if not found raise Error
@@ -115,14 +127,6 @@ class GrammarVisitor(ProjectVisitor):
 
         return val
 
-    
-
-        
-
-
-
-
-
 def isValidInt(string: str):
     try:
         int(string)
@@ -137,3 +141,8 @@ def isValidFloat(string: str):
     except:
         return False
 
+def isValidBool(string: str):
+    if string == "True" or string == "False":
+        return True
+    else:
+        return False
