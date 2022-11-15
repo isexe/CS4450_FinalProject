@@ -62,16 +62,9 @@ class GrammarVisitor(ProjectVisitor):
         r_val = None
         val = None
 
-        # main difference between listener and visitor is visitor must invoke visit to continue
-            
-        # check for nested expression
-        """if(ctx != None):
-            val = self.visitExpression(ctx)
-        
-        val = None
-        l_val = self.visitId(ctx)"""
+        l_val = self.visitId(ctx.left)
 
-        r_val = self.visitAssign_val(r_val)
+        r_val = self.visitAssign_val(ctx.right)
 
         if l_val in sampleDict: 
             val = sampleDict[l_val]
@@ -92,11 +85,11 @@ class GrammarVisitor(ProjectVisitor):
             print(sampleDict[str(l_val)])
 
 
-    def visitId(self, ctx: ProjectParser.EquationContext):
+    def visitId(self, ctx: ProjectParser.IdContext):
         return ctx.VAR()
     
     
-    def visitAssign_val(self, ctx: ProjectParser.EquationContext):
+    def visitAssign_val(self, ctx: ProjectParser.Assign_valContext):
         if(ctx == None):
             return ctx
         if(ctx.VAR()):
