@@ -4,6 +4,7 @@ from Grammar.ProjectParser import ProjectParser
 from Grammar.ProjectVisitor import ProjectVisitor
 
 from Visitors.EquationVisitor import EquationVisitor
+from Visitors.AssignVisitor import AssignVisitor
 
 class GrammarVisitor(ProjectVisitor):
     def __init__(self, debugging = False):
@@ -36,3 +37,14 @@ class GrammarVisitor(ProjectVisitor):
             print("Equation:\n" + ctx.getText() + " = " + str(result))
 
         return result
+
+    # Visit a parse tree produced by ProjectParser#assign.
+    def visitAssign(self, ctx: ProjectParser.AssignContext):
+        result = AssignVisitor().visitAssign(ctx)
+
+        if(self.debugging):
+            print("Assign:\n" + ctx.getText())
+
+        return result
+
+
