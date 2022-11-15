@@ -49,15 +49,6 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     # Visit a parse tree produced by ProjectParser#assign.
-    # def visitAssign(self, ctx: ProjectParser.AssignContext):
-    #     result = AssignVisitor().visitAssign(ctx)
-
-    #     if(self.debugging):
-    #         print("Assign:\n" + ctx.getText())
-
-    #     return result
-
-
     def visitAssign(self, ctx: ProjectParser.AssignContext):
         if(ctx == None):
             return None
@@ -122,8 +113,7 @@ class GrammarVisitor(ProjectVisitor):
         #     val = r_val
         #     val.type = typeof(r_val)
 
-
-        return val;
+        return val
 
     
 

@@ -9,7 +9,7 @@ lines : statement EOL ;
 
 // all the parse rules that need to be followed
 statement 
-    : expression
+    : equation
     | assign
     ;
 
