@@ -8,13 +8,16 @@ from Visitors.AssignVisitor import AssignVisitor
 
 sampleDict = {
   "myVar" : {
-              "Address" : "",
-              "Value" : "",
-              "Type" : "",
-              "Lifetime" : "",
-              "Scope" : ""
+              "Address" : "",   # ?
+              "Value" : "",     # value of var
+              "Type" : "",      # type(dict["Value"])
+              "Lifetime" : "",  # ?
+              "Scope" : ""      # ?
             }
 }
+
+# need to serialize this into a json or something else so we can access from other visitors
+varDict = {}
 
 class GrammarVisitor(ProjectVisitor):
     def __init__(self, debugging = False):
@@ -53,37 +56,74 @@ class GrammarVisitor(ProjectVisitor):
         if(ctx == None):
             return None
         # used for debugging/printing tree
-        tab = '    '
-        tab = (ctx.depth()-1) * tab
-        print(tab + str(ctx.getText()))
+        # tab = '    '
+        # tab = (ctx.depth()-1) * tab
+        # print(tab + str(ctx.getText()))
 
             #placeholders
-        l_val = None
-        r_val = None
         val = None
+        value_type = None
 
         l_val = self.visitId(ctx.left)
-
         r_val = self.visitAssign_val(ctx.right)
 
-        if l_val in sampleDict: 
-            val = sampleDict[l_val]
+        if(type(r_val) is dict):
+            # r_val is a variable passed in, need to handle it
+            # for now just set r_val to value of variable
+            r_val = r_val.get("Value")
+
+        if(r_val == None):
+            r_val = None
         else:
-            #create variable and insert into dict where key = l_val
-            if r_val == None :
-                value_type = "None"
-            if isValidInt(r_val):
-                value_type = "Int"
-            elif isValidFloat(r_val):
-                value_type = "Float"
-            elif isValidBool(r_val): 
-                value_type = "Bool"
+            r_val = str(r_val)
+            if(isValidInt(r_val)):
+                r_val = int(r_val)
+            elif(isValidFloat(r_val)):
+                r_val = float(r_val)
+            elif(isValidBool(r_val)):
+                r_val = bool(r_val)
             else:
-                value_type = "String"
+                r_val = str(r_val)
 
-            sampleDict[str(l_val)] = { "Address" : "", "Value" : r_val, "Type" : value_type, "Lifetime" : "", "Scope" : ""}
-            print(sampleDict[str(l_val)])
+        # check if variable already defined
+        if l_val in varDict: 
+            val = varDict[l_val]
 
+        #create variable and insert into dict where key = l_val
+        value_type = type(r_val)
+        
+        # if the variable is previously defined
+        if(val != None):
+            op = ""
+            try:
+                if(ctx.PLU_EQU)():
+                    op = "+="
+                    val['Value'] += r_val
+                elif(ctx.MIN_EQU()):
+                    op = "-="
+                    val["Value"] -= r_val
+                elif(ctx.MULT_equ()):
+                    op = "*="
+                    val["Value"] *= r_val
+                elif(ctx.DIV_EQU()):
+                    op = "/="
+                    val["Value"] /= r_val
+                elif(ctx.EQU()):
+                    op = "="
+                    val["Value"] = r_val
+
+                val["Type"] = type(val["Value"])
+            except:
+                errMsg = "unsupported operand type(s) for " + op + ": " + str(type(val.get("Value"))) + " and " + str(type(r_val))
+                TypeError(errMsg)
+        else:
+            varDict[str(l_val)] = { "Address" : "", "Value" : r_val, "Type" : value_type, "Lifetime" : "", "Scope" : ""}
+
+        # used for debugging
+        print("Variables after '" + str(ctx.getText()) + "' assignment:")
+        for key in varDict:
+            print(str(key) + ":\t" + str(varDict.get(key)))
+        print()
 
     def visitId(self, ctx: ProjectParser.IdContext):
         return ctx.VAR()
@@ -91,10 +131,15 @@ class GrammarVisitor(ProjectVisitor):
     
     def visitAssign_val(self, ctx: ProjectParser.Assign_valContext):
         if(ctx == None):
-            return ctx
+            return None
+
         if(ctx.VAR()):
-            assign_val = sampleDict[ctx.VAR()]
-            #if not found raise Error
+            assign_val = varDict.get(str(ctx.VAR()))
+            
+            if(assign_val == None):
+                # TODO Variable undefined, need to handle
+                pass
+
             return assign_val
         elif(ctx.ATOM()):
             val = str(ctx.ATOM())
@@ -104,9 +149,8 @@ class GrammarVisitor(ProjectVisitor):
                 val = float(val)
             else:
                 val = str(val)
-        elif(ctx.equation != None):
-            return EquationVisitor.visitEquation(ctx.equation)
-            #print("need to find and import eq visitor, will need to pull from github")
+        elif(ctx.equation() != None):
+            return EquationVisitor().visitEquation(ctx.equation())
         else:
             print("something is very wrong")
         
@@ -120,22 +164,22 @@ class GrammarVisitor(ProjectVisitor):
 
         return val
 
-def isValidInt(string: str):
+def isValidInt(string):
     try:
-        int(string)
+        int(str(string))
         return True
     except:
         return False
 
-def isValidFloat(string: str):
+def isValidFloat(string):
     try:
-        float(string)
+        float(str(string))
         return True
     except:
         return False
 
-def isValidBool(string: str):
-    if string == "True" or string == "False":
+def isValidBool(string):
+    if str(string) == "True" or str(string) == "False":
         return True
     else:
         return False
