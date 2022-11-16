@@ -1,5 +1,7 @@
 grammar Project;
 
+// information on how to reserve words that variables can't use was found here 
+// https://stackoverflow.com/questions/9726620/how-can-i-differentiate-between-reserved-words-and-variables-using-antlr
 RESERVED_WORD 
     : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' 
     | 'if' | 'else' | 'while' | 'return' | 'null' | 'true' | 'false' | 'this' 
@@ -18,7 +20,9 @@ statement
     | assign
     ;
 
-//parser rule for assignment
+// parser rule for assignment
+// the informtion on assignment operator syntax was found here
+// https://www2.southeastern.edu/Academics/Faculty/kyang/2018/Summer/CMPS401/ClassNotes/CMPS401ClassNotesChap03.pdf
 assign
     : left=id operator=EQU right=assign_val
     | left=id operator=PLU_EQU right=assign_val
