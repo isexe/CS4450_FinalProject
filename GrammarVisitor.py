@@ -105,6 +105,9 @@ class AssignVisitor(ProjectVisitor):
             try:
                 if(ctx.PLU_EQU()):
                     op = "+="
+                    if val['Type'] == str:
+                        val['Value'] = val['Value'][:-1]
+                        r_val = r_val[1:]
                     val['Value'] += r_val
                 elif(ctx.MIN_EQU()):
                     op = "-="
