@@ -13,7 +13,7 @@ RESERVED_WORD
 code : (block | line)* EOF ;
 
 // blocks of code
-block : ifStatement;
+block : ifElseBlock;
 
 // each line of code
 line : statement EOL ;
@@ -30,11 +30,16 @@ statement
 TODO need to allow for nested blocks
 to do this will need to figure out how to track indents
 */
+
+ifElseBlock :
+    ifStatement
+    (elifStatement)*
+    (elseStatement)?
+    ;
+
 ifStatement
     : (IF ('(') logicExpr ('):')) EOL 
         (TAB line)+
-    (elifStatement)?
-    (elseStatement)?
     ;
 
 elifStatement
@@ -56,9 +61,9 @@ logicExpr
     ;
 
 logicVal
-    : VAR
-    | ATOM 
-    | equation
+    : (NOT)? VAR
+    | (NOT)? ATOM 
+    | (NOT)? equation
     ;
 
 logicOp
@@ -73,7 +78,6 @@ logicOp
 logicConj
     : AND
     | OR
-    | NOT
     ;
 
 AND : 'and' ;
