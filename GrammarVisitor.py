@@ -24,14 +24,14 @@ class GrammarVisitor(ProjectVisitor):
         self.debugging = debugging
     
     # Visit a parse tree produced by ProjectParser#code.
-    # Next Node is Lines
+    # Next Node is Line
     def visitCode(self, ctx:ProjectParser.CodeContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ProjectParser#lines.
+    # Visit a parse tree produced by ProjectParser#line.
     # Next Node is Statement
-    def visitLines(self, ctx:ProjectParser.LinesContext):
+    def visitLine(self, ctx:ProjectParser.LineContext):
         return self.visitChildren(ctx)
 
 
