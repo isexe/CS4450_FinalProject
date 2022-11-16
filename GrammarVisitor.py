@@ -117,7 +117,7 @@ class GrammarVisitor(ProjectVisitor):
                 errMsg = "unsupported operand type(s) for " + op + ": " + str(type(val.get("Value"))) + " and " + str(type(r_val))
                 TypeError(errMsg)
         else:
-            varDict[str(l_val)] = { "Address" : "", "Value" : r_val, "Type" : value_type, "Lifetime" : "", "Scope" : ""}
+            varDict[str(l_val)] = { "Address" :id(r_val), "Value" : r_val, "Type" : value_type, "Lifetime" : "", "Scope" : ""}
 
         # used for debugging
         print("Variables after '" + str(ctx.getText()) + "' assignment:")
