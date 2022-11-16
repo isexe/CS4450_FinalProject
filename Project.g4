@@ -55,7 +55,7 @@ factor : val ((mult | div | mod) val)* ;
 
 val
     : '(' sum ')'
-    | ATOM
+    | NUM
     | VAR
     ;
 

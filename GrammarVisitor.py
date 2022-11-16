@@ -128,9 +128,10 @@ class AssignVisitor(ProjectVisitor):
                 errMsg = "unsupported operand type(s) for " + op + ": " + str(type(val.get("Value"))) + " and " + str(type(r_val))
                 TypeError(errMsg)
         else:
-            varDict[str(l_val)] = { "Address" :id(r_val), "Value" : r_val, "Type" : value_type, "Lifetime" : "", "Scope" : ""}
+            val = { "Address" :id(r_val), "Value" : r_val, "Type" : value_type, "Lifetime" : "", "Scope" : ""}
+            varDict[str(l_val)] = val
 
-        # return variable
+        return val
 
     def visitId(self, ctx: ProjectParser.IdContext):
         return ctx.VAR()
@@ -159,14 +160,6 @@ class AssignVisitor(ProjectVisitor):
             return EquationVisitor().visitEquation(ctx.equation())
         else:
             print("something is very wrong")
-        
-        #ill implement this later
-        # if r_val is variable 
-        #     val.Value = r_val.Value
-        #     val.Type = r_val.Type
-        # elif r_val is int, float, or string 
-        #     val = r_val
-        #     val.type = typeof(r_val)
 
         return val
 
@@ -234,7 +227,6 @@ class EquationVisitor(ProjectVisitor):
                     raise UnexpectedError("Addition/Subtraction sign was value other than '+', '-'")
                 # reset sign value so we know it's next
                 sign = None
-        print(result)
         return result
 
     # Step 3:
@@ -284,8 +276,19 @@ class EquationVisitor(ProjectVisitor):
     def visitVal(self, ctx:ProjectParser.ValContext):
         # is variable
         if(ctx.VAR()):
-            # TODO
-            UnexpectedError("ctx.VAR() has not been implemented in equation")
+            var = varDict.get(str(ctx.VAR()))
+            
+            if(var == None):
+                raise NameError("name '" + str(ctx.VAR()) + "' is not defined")
+
+            assign_val = var.get("Value")
+
+            if(var.get("Type") == type(int)):
+                assign_val = int(assign_val)
+            elif(var.get("Type") == type(float)):
+                assign_val = float(assign_val)    
+
+            return assign_val
         # is atom value
         elif(ctx.ATOM()):
             return ctx.ATOM()
