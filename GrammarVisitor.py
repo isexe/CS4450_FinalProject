@@ -159,7 +159,7 @@ class AssignVisitor(ProjectVisitor):
         elif(ctx.equation() != None):
             return EquationVisitor().visitEquation(ctx.equation())
         else:
-            print("something is very wrong")
+            raise UnexpectedError("Assigned value isn't an atom or equation")
 
         return val
 
@@ -217,15 +217,23 @@ class EquationVisitor(ProjectVisitor):
             elif(sign == None):
                 sign = childResult
             else:
-                # find what the sign is and apply it to result and childResult
-                if(sign == "+"):
-                    result = result + childResult
-                elif(sign == "-"):
-                    result = result - childResult
-                else:
-                    # Catch any signs that shouldn't be present
-                    raise UnexpectedError("Addition/Subtraction sign was value other than '+', '-'")
-                # reset sign value so we know it's next
+                try:
+                    # find what the sign is and apply it to result and childResult
+                    if(sign == "+"):
+                        if(type(result) is str and type(childResult) is str):
+                            result = result[:-1]
+                            childResult = childResult[1:]
+                        result = result + childResult
+                    elif(sign == "-"):
+                        result = result - childResult
+                    else:
+                        # Catch any signs that shouldn't be present
+                        raise UnexpectedError("Addition/Subtraction sign was value other than '+', '-'")
+                    # reset sign value so we know it's next
+                    
+                except:
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                    
                 sign = None
         return result
 
@@ -256,17 +264,31 @@ class EquationVisitor(ProjectVisitor):
             elif(sign == None):
                 sign = childResult
             else:
-                if(sign == "*"):
-                    result = result * childResult
-                elif(sign == "/"):
-                    result = result / childResult
-                elif(sign == "%"):
-                    result = result % childResult
-                else:
-                    UnexpectedError("Multiplication/Division/Modulo sign was value other than '*', '/', '%'")
+                try:
+                    if(sign == "*"):
+                        if(type(result) is str and type(childResult) is int):
+                            quote = result[0]
+                            result = result[1:-1]
+                            result = result * childResult
+                            result = quote + result + quote
+                        elif(type(result) is int and type(childResult) is str):
+                            quote = childResult[0]
+                            childResult = childResult[1:-1]
+                            result = result * childResult
+                            result = quote + result + quote
+                        else:
+                            result = result * childResult
+                    elif(sign == "/"):
+                        result = result / childResult
+                    elif(sign == "%"):
+                        result = result % childResult
+                    else:
+                        UnexpectedError("Multiplication/Division/Modulo sign was value other than '*', '/', '%'")
+                except:
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                
                 sign = None
 
-        print(result)
         return result
 
     # Step 4
