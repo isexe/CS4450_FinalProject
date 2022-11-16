@@ -46,31 +46,40 @@ MIN_EQU : '-=' ;
 MULT_EQU : '*=' ;
 DIV_EQU : '/=' ;
 
-
+//*** NOTES
 // Arithmetic rule
 // grows one way rather than both to fix ambiguity
 // changed lexer rules to parse rules
 // broke apart into seperate rules for neatness and more control
 // Depth First Search so important at bottom
+
+
 // parser rule for arithmetic
-equation : sum ;
+equation : eqFourthOrder ;
 
-// redundant but more readable in here and py code
-sum : factor ((add | sub) factor)* ;
+// follow order of operations in ascending order
+eqFourthOrder : eqThirdOrder ((add | sub) eqThirdOrder)* ;
 
-factor : val ((mult | div | mod) val)* ;
+eqThirdOrder : eqSecondOrder ((mult | div | mod) eqSecondOrder)* ;
 
-val
-    : '(' sum ')'
-    | NUM
+eqSecondOrder : eqFirstOrder ((expon | sqrt) eqFirstOrder)* ;
+
+// moved negative sign here by suggestion in reference #6
+eqFirstOrder
+    : sign=('+' | '-')? ('(' para=eqFourthOrder ')' | terminal=eqVal)
+    ;
+
+eqVal
+    : ATOM
     | VAR
-    | ATOM
     ;
 
 // parser rules used in the equation parse rule
 // all the different math operators
 // were lexer rules but changed in hopes it would fix the positive sign issue
 // 1 +1 is read as two equations 1 and +1 rather than 1+1
+expon : '**' ;
+sqrt : '//' ;
 mult : '*' ;
 div : '/' ;
 mod : '%' ;
@@ -89,7 +98,7 @@ ATOM
 // rule for signed decimal numbers
 // requires num before . so need to add option for no num but forced decimal
 // now 0.0, 0., and .0 are all valid
-NUM : ('+' | '-')? DECIMAL ;
+NUM : DECIMAL ;
 
 // real numbers
 // works with 0.0 .0 and 0.

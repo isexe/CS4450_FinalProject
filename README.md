@@ -30,3 +30,4 @@ Python
 3. <https://tomassetti.me/antlr-mega-tutorial/#chapter11>
 4. <https://www2.southeastern.edu/Academics/Faculty/kyang/2018/Summer/CMPS401/ClassNotes/CMPS401ClassNotesChap03.pdf>
 5. <https://stackoverflow.com/questions/9726620/how-can-i-differentiate-between-reserved-words-and-variables-using-antlr>
+6. <https://stackoverflow.com/questions/34368305/antlr-calculator-with-negative-numbers-support>
