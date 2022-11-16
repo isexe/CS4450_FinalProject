@@ -86,8 +86,8 @@ class GrammarVisitor(ProjectVisitor):
                 r_val = str(r_val)
 
         # check if variable already defined
-        if l_val in varDict: 
-            val = varDict[l_val]
+        if str(l_val) in varDict.keys(): 
+            val = varDict[str(l_val)]
 
         #create variable and insert into dict where key = l_val
         value_type = type(r_val)
