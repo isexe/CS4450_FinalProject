@@ -1,14 +1,19 @@
 grammar Project;
 
 // information on how to reserve words that variables can't use was found at resource #5
+// as you need to use these remove them from list and insert them in the section you used them
+// i.e. if section now has lexer rule for IF and ELSE
 RESERVED_WORD 
     : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' 
-    | 'if' | 'else' | 'while' | 'return' | 'null' | 'true' | 'false' | 'this' 
+    | 'while' | 'return' | 'null' | 'this' 
     | 'new' | 'String' | 'str' | 'int' | 'float' | 'complex'| 'list' | 'tuple' | 'range'
     | 'dict' | 'set' | 'frozenset' | 'bool' | 'bytes' | 'bytearray' | 'memoryview' | 'nonetype';
 
 // compile all the code
-code : line* EOF ;
+code : (block | line)* EOF ;
+
+// blocks of code
+block : ifStatement;
 
 // each line of code
 line : statement EOL ;
@@ -20,6 +25,58 @@ statement
     : assign
     | equation
     ;
+
+/* 
+TODO need to allow for nested blocks
+to do this will need to figure out how to track indents
+*/
+ifStatement
+    : (IF ('(') logicExpr ('):')) EOL 
+        (TAB line)+
+    (elifStatement)?
+    (elseStatement)?
+    ;
+
+elifStatement
+    : (ELIF ('(') logicExpr ('):')) EOL 
+        (TAB line)+
+    ;
+
+elseStatement
+    : ELSE (':') EOL
+        (TAB line)+
+    ;
+
+IF: 'if' ;
+ELIF: 'elif' ;
+ELSE: 'else' ;
+
+logicExpr 
+    : logicVal (logicOp logicVal)? (logicConj logicExpr)?
+    ;
+
+logicVal
+    : VAR
+    | ATOM 
+    | equation
+    ;
+
+logicOp
+    : '=='
+    | '!='
+    | '>='
+    | '>'
+    | '<='
+    | '<'
+    ;
+
+logicConj
+    : AND
+    | OR
+    ;
+
+AND : 'and' ;
+OR : 'or' ;
 
 // parser rule for assignment
 // information on assignemnt operators found at resource #4
@@ -91,31 +148,21 @@ sub : '-' ;
 // rule for defining datatypes
 ATOM
     : NUM
-    | CHAR
+    | STRING
     | BOOL
     | NONE
     ;
 
-// TODO currently this breaks the addition and subtraction if there isn't a space
-// rule for signed decimal numbers
-// requires num before . so need to add option for no num but forced decimal
-// now 0.0, 0., and .0 are all valid
-NUM : DECIMAL ;
 
 // real numbers
 // works with 0.0 .0 and 0.
-DECIMAL 
+NUM 
     : DIGIT+ ('.' DIGIT*)?
     | (DIGIT* '.')? DIGIT+
     ;
 
 // 1 digit numbers
-DIGIT : [0-9] ;
-
-// TODO need to include much more than this
-CHAR : QUOTES ([A-Za-z] | [0-9] | WS | TAB | EOL)+ QUOTES;
-
-QUOTES : '"' | '\'';
+fragment DIGIT : [0-9] ;
 
 // Bool
 BOOL : 'True' | 'False' ;
@@ -123,12 +170,21 @@ BOOL : 'True' | 'False' ;
 // None
 NONE : 'None' ;
 
+
+
+// TODO need to include much more than this
+STRING : QUOTES (CHAR | DIGIT | WS | TAB | EOL)+ QUOTES;
+
+fragment QUOTES : '"' | '\'';
+
+fragment CHAR : [A-Za-z] ;
+
 // follow python naming conventions
 VAR : [A-Za-z_][0-9A-Za-z_]* ;
 
 EOL : [\n\r]+ ;
 
 // not impemented yet but tabs are used for scope not WS
-TAB : [\t] -> skip;
+TAB : [\t];
 
 WS : [ ]+ -> skip ;
