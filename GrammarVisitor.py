@@ -113,7 +113,7 @@ class AssignVisitor(ProjectVisitor):
                 elif(ctx.MIN_EQU()):
                     op = "-="
                     val["Value"] -= r_val
-                elif(ctx.MULT_equ()):
+                elif(ctx.MULT_EQU()):
                     op = "*="
                     val["Value"] *= r_val
                 elif(ctx.DIV_EQU()):
@@ -126,7 +126,7 @@ class AssignVisitor(ProjectVisitor):
                 val["Type"] = type(val["Value"])
             except:
                 errMsg = "unsupported operand type(s) for " + op + ": " + str(type(val.get("Value"))) + " and " + str(type(r_val))
-                TypeError(errMsg)
+                raise TypeError(errMsg)
         else:
             val = { "Address" :id(r_val), "Value" : r_val, "Type" : value_type, "Lifetime" : "", "Scope" : ""}
             varDict[str(l_val)] = val
@@ -283,7 +283,7 @@ class EquationVisitor(ProjectVisitor):
                     elif(sign == "%"):
                         result = result % childResult
                     else:
-                        UnexpectedError("Multiplication/Division/Modulo sign was value other than '*', '/', '%'")
+                        raise UnexpectedError("Multiplication/Division/Modulo sign was value other than '*', '/', '%'")
                 except:
                     raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
                 
