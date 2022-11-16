@@ -73,10 +73,12 @@ logicOp
 logicConj
     : AND
     | OR
+    | NOT
     ;
 
 AND : 'and' ;
 OR : 'or' ;
+NOT : 'not' ;
 
 // parser rule for assignment
 // information on assignemnt operators found at resource #4
