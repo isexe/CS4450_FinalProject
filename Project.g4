@@ -1,7 +1,6 @@
 grammar Project;
 
-// information on how to reserve words that variables can't use was found here 
-// https://stackoverflow.com/questions/9726620/how-can-i-differentiate-between-reserved-words-and-variables-using-antlr
+// information on how to reserve words that variables can't use was found at resource #5
 RESERVED_WORD 
     : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' 
     | 'if' | 'else' | 'while' | 'return' | 'null' | 'true' | 'false' | 'this' 
@@ -21,8 +20,7 @@ statement
     ;
 
 // parser rule for assignment
-// the informtion on assignment operator syntax was found here
-// https://www2.southeastern.edu/Academics/Faculty/kyang/2018/Summer/CMPS401/ClassNotes/CMPS401ClassNotesChap03.pdf
+// information on assignemnt operators found at resource #4
 assign
     : left=id operator=EQU right=assign_val
     | left=id operator=PLU_EQU right=assign_val
@@ -71,8 +69,8 @@ val
 
 // parser rules used in the equation parse rule
 // all the different math operators
-// believe parser rules have higher precedence than lexer rules
-// hopefully this fixes issues with positive values
+// were lexer rules but changed in hopes it would fix the positive sign issue
+// 1 +1 is read as two equations 1 and +1 rather than 1+1
 mult : '*' ;
 div : '/' ;
 mod : '%' ;

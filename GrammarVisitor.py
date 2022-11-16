@@ -13,7 +13,7 @@ sampleDict = {
             }
 }
 
-# need to serialize this into a json or something else so we can access from other visitors
+# "stack" that variables are stored ion
 varDict = {}
 
 class UnexpectedError(Exception):
@@ -66,12 +66,8 @@ class AssignVisitor(ProjectVisitor):
     def visitAssign(self, ctx: ProjectParser.AssignContext):
         if(ctx == None):
             return None
-        # used for debugging/printing tree
-        # tab = '    '
-        # tab = (ctx.depth()-1) * tab
-        # print(tab + str(ctx.getText()))
 
-            #placeholders
+        #placeholders
         val = None
         value_type = None
 
@@ -83,7 +79,7 @@ class AssignVisitor(ProjectVisitor):
             # for now just set r_val to value of variable
             r_val = r_val.get("Value")
 
-        if(r_val == None):
+        if(r_val == None or r_val == "None"):
             r_val = None
         else:
             r_val = str(r_val)
@@ -107,7 +103,7 @@ class AssignVisitor(ProjectVisitor):
         if(val != None):
             op = ""
             try:
-                if(ctx.PLU_EQU)():
+                if(ctx.PLU_EQU()):
                     op = "+="
                     val['Value'] += r_val
                 elif(ctx.MIN_EQU()):
@@ -154,6 +150,10 @@ class AssignVisitor(ProjectVisitor):
                 val = int(val)
             elif(isValidFloat(val)):
                 val = float(val)
+            elif(isValidBool(val)):
+                val = bool(val)
+            elif(val == "None"):
+                val = None
             else:
                 val = str(val)
         elif(ctx.equation() != None):
