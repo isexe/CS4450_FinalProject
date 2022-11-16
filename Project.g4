@@ -17,13 +17,9 @@ line : statement EOL ;
 // be careful, currently equation can go straight to atom and overshadow stuff
 // with the addition of declare make sure to keep equation at the bottom
 statement 
-    : declare
-    | assign
+    : assign
     | equation
     ;
-
-// parser rule for declaring a variable
-declare : VAR;
 
 // parser rule for assignment
 // information on assignemnt operators found at resource #4
