@@ -18,7 +18,7 @@ assign
     : left=id operator=EQU right=assign_val
     | left=id operator=PLU_EQU right=assign_val
     | left=id operator=MIN_EQU right=assign_val
-    | left=id operator=MULT_equ right=assign_val
+    | left=id operator=MULT_EQU right=assign_val
     | left=id operator=DIV_EQU right=assign_val
     ;
 
@@ -36,7 +36,7 @@ id : VAR ;
 EQU : '=' ;
 PLU_EQU : '+=' ;
 MIN_EQU : '-=' ;
-MULT_equ : '*=' ;
+MULT_EQU : '*=' ;
 DIV_EQU : '/=' ;
 
 
