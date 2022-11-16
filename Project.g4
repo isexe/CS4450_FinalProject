@@ -8,16 +8,22 @@ RESERVED_WORD
     | 'dict' | 'set' | 'frozenset' | 'bool' | 'bytes' | 'bytearray' | 'memoryview' | 'nonetype';
 
 // compile all the code
-code : lines* EOF ;
+code : line* EOF ;
 
 // each line of code
-lines : statement EOL ;
+line : statement EOL ;
 
 // all the parse rules that need to be followed
+// be careful, currently equation can go straight to atom and overshadow stuff
+// with the addition of declare make sure to keep equation at the bottom
 statement 
-    : equation
+    : declare
     | assign
+    | equation
     ;
+
+// parser rule for declaring a variable
+declare : VAR;
 
 // parser rule for assignment
 // information on assignemnt operators found at resource #4
