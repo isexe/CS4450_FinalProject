@@ -96,9 +96,6 @@ class AssignVisitor(ProjectVisitor):
         if str(l_val) in varDict.keys(): 
             val = varDict[str(l_val)]
 
-        #create variable and insert into dict where key = l_val
-        value_type = type(r_val)
-        
         # if the variable is previously defined
         if(val != None):
             op = ""
@@ -114,7 +111,19 @@ class AssignVisitor(ProjectVisitor):
                     val["Value"] -= r_val
                 elif(ctx.MULT_EQU()):
                     op = "*="
-                    val["Value"] *= r_val
+                    tmp = val["Value"]
+                    if(type(tmp) is str and type(r_val) is int):
+                        quote = tmp[0]
+                        tmp = tmp[1:-1]
+                        tmp = tmp * r_val
+                        val["Value"] = quote + tmp + quote
+                    elif(type(tmp) is int and type(r_val) is str):
+                        quote = r_val[0]
+                        r_val = r_val[1:-1]
+                        r_val = r_val * tmp
+                        val["Value"] = quote + r_val + quote
+                    else:
+                        val["Value"] *= r_val
                 elif(ctx.DIV_EQU()):
                     op = "/="
                     val["Value"] /= r_val
@@ -127,7 +136,7 @@ class AssignVisitor(ProjectVisitor):
                 errMsg = "unsupported operand type(s) for " + op + ": " + str(type(val.get("Value"))) + " and " + str(type(r_val))
                 raise TypeError(errMsg)
         else:
-            val = { "Address" :id(r_val), "Value" : r_val, "Type" : value_type, "Lifetime" : "", "Scope" : ""}
+            val = { "Address" :id(r_val), "Value" : r_val, "Type" : type(r_val), "Lifetime" : "", "Scope" : ""}
             varDict[str(l_val)] = val
 
         return val
@@ -179,39 +188,43 @@ class EquationVisitor(ProjectVisitor):
     def visitEquationChildren(self, node):
         # Since we know equation only has 1 child just get it
         c = node.getChild(0)
-        result = str(c.accept(self))
+        result = c.accept(self)
         
-        if(isValidInt(result)):
-            result = int(result)
-        elif(isValidFloat(result)):
-            result = float(result)
+        if(result != None):
+            result = str(result)
+            if(isValidInt(result)):
+                result = int(result)
+            elif(isValidFloat(result)):
+                result = float(result)
 
         return result
 
 
     # Step 2:
-    # Visit a parse tree produced by ProjectParser#sum.
-    def visitSum(self, ctx:ProjectParser.SumContext):
-        result = self.visitSumChildren(ctx)
+    # Visit a parse tree produced by ProjectParser#eqFourthOrder.
+    def visitEqFourthOrder(self, ctx:ProjectParser.EqFourthOrderContext):
+        result = self.visitEqFourthOrderChildren(ctx)
         return result
 
     # Step 2.5:
-    # Visit children of a parse tree produced by ProjectParser#sum.
-    def visitSumChildren(self, node):
+    # Visit children of a parse tree produced by ProjectParser#eqFourthOrder.
+    def visitEqFourthOrderChildren(self, node):
         result = None
         sign = None
         n = node.getChildCount()
         for i in range(n):
             # get child then visit them
             c = node.getChild(i)
-            childResult = str(c.accept(self))
+            childResult = c.accept(self)
 
             # We know at this point the value we have is a int, float, str
             # try guessing the value and going with the first valid option
-            if(isValidInt(childResult)):
-                childResult = int(childResult)
-            elif(isValidFloat(childResult)):
-                childResult = float(childResult)
+            if(childResult != None):
+                childResult = str(childResult)
+                if(isValidInt(childResult)):
+                    childResult = int(childResult)
+                elif(isValidFloat(childResult)):
+                    childResult = float(childResult)
 
             # if result is none just set it to the first value we found
             if(result == None):
@@ -241,26 +254,28 @@ class EquationVisitor(ProjectVisitor):
         return result
 
     # Step 3:
-    # Visit a parse tree produced by ProjectParser#factor.
-    def visitFactor(self, ctx:ProjectParser.FactorContext):
-        result = self.visitFactorChildren(ctx)
+    # Visit a parse tree produced by ProjectParser#eqThirdOrder.
+    def visitEqThirdOrder(self, ctx:ProjectParser.EqThirdOrderContext):
+        result = self.visitEqThirdOrderChildren(ctx)
         return result
 
     # Step 3.5
     # functions identically to sum
-    # Visit children of a parse tree produced by ProjectParser#factor.
-    def visitFactorChildren(self, node):
+    # Visit children of a parse tree produced by ProjectParser#eqThirdOrder.
+    def visitEqThirdOrderChildren(self, node):
         result = None
         sign = None
         n = node.getChildCount()
         for i in range(n):
             c = node.getChild(i)
-            childResult = str(c.accept(self))
+            childResult = c.accept(self)
             
-            if(isValidInt(childResult)):
-                childResult = int(childResult)
-            elif(isValidFloat(childResult)):
-                childResult = float(childResult)
+            if(childResult != None):
+                childResult = str(childResult)
+                if(isValidInt(childResult)):
+                    childResult = int(childResult)
+                elif(isValidFloat(childResult)):
+                    childResult = float(childResult)
 
             if(result == None):
                 result = childResult
@@ -294,11 +309,85 @@ class EquationVisitor(ProjectVisitor):
 
         return result
 
-    # Step 4
+    # Step 4:
+    # Visit a parse tree produced by ProjectParser#eqSecondOrder.
+    def visitEqSecondOrder(self, ctx: ProjectParser.EqSecondOrderContext):
+        result = self.visitEqSecondOrderChildren(ctx)
+        return result
+
+    # Step 4.5
+    # functions identically to other orders of operations
+    # Visit children of a parse tree produced by ProjectParser#eqSecondOrder.
+    def visitEqSecondOrderChildren(self, node):
+        result = None
+        sign = None
+        n = node.getChildCount()
+        for i in range(n):
+            c = node.getChild(i)
+            childResult = c.accept(self)
+            
+            if(childResult != None):
+                childResult = str(childResult)
+                if(isValidInt(childResult)):
+                    childResult = int(childResult)
+                elif(isValidFloat(childResult)):
+                    childResult = float(childResult)
+
+            if(result == None):
+                result = childResult
+            elif(sign == None):
+                sign = childResult
+            else:
+                try:
+                    if(sign == "**"):
+                        result = result ** childResult
+                    elif(sign == "//"):
+                        result = result // childResult
+                    else:
+                        raise UnexpectedError("Power/Square sign was value other than '**', '//'")
+                except:
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                
+                sign = None
+
+        return result
+
+    # Step 5
     # This step will either return an ATOM or VAR if the equation is done
     # Or another equation if there is some nested in paranthesis
     # Visit a parse tree produced by ProjectParser#val.
-    def visitVal(self, ctx:ProjectParser.ValContext):
+    def visitEqFirstOrder(self, ctx: ProjectParser.EqFirstOrderContext):
+        
+        result = None
+
+        if(ctx.para != None):
+            result = self.visitEqFourthOrder(ctx.para)
+        elif(ctx.terminal != None):
+            result = self.visitEqVal(ctx.terminal)
+
+        if(result != None):
+            result = str(result)
+            if(isValidInt(result)):
+                result = int(result)
+            elif(isValidFloat(result)):
+                result = float(result)
+
+        if(ctx.sign != None):
+            if(ctx.sign.text == "-"):
+                try:
+                    result = -result
+                except:
+                    raise TypeError("bad operand type for unary -: " + type(result))
+            elif(ctx.sign.text == "+"):
+                try:
+                    result = +result
+                except:
+                    raise TypeError("bad operand type for unary +: " + type(result))
+
+        return result
+
+    def visitEqVal(self, ctx: ProjectParser.EqValContext):
+        result = None
         # is variable
         if(ctx.VAR()):
             var = varDict.get(str(ctx.VAR()))
@@ -306,35 +395,20 @@ class EquationVisitor(ProjectVisitor):
             if(var == None):
                 raise NameError("name '" + str(ctx.VAR()) + "' is not defined")
 
-            assign_val = var.get("Value")
+            result = var.get("Value")
 
-            if(var.get("Type") == type(int)):
-                assign_val = int(assign_val)
-            elif(var.get("Type") == type(float)):
-                assign_val = float(assign_val)    
-
-            return assign_val
+            # should be stored as it's proper type
+            # if(var.get("Type") == type(int)):
+            #     result = int(result)
+            # elif(var.get("Type") == type(float)):
+            #     result = float(result)
+            
         # is atom value
         elif(ctx.ATOM()):
-            return ctx.ATOM()
-        # is equation so continue
-        else:
-            return self.visitValChildren(ctx)
-    
-    # Step 4.5 
-    # nested equation
-    # Visit the children of a parse tree produced by ProjectParser#val.
-    def visitValChildren(self, node):
-        # since we know the only time this is called is when Val = '(' sum ')' just get value of sum
-        c = node.getChild(1)
-        result = str(c.accept(self))
-        
-        if(isValidInt(result)):
-            result = int(result)
-        elif(isValidFloat(result)):
-            result = float(result)
+            result = ctx.ATOM()
 
         return result
+
 
     # This will get the '*' operator
     # Visit a parse tree produced by ProjectParser#mult.
@@ -360,6 +434,16 @@ class EquationVisitor(ProjectVisitor):
     # This will get the '-' operator
     # Visit a parse tree produced by ProjectParser#sub.
     def visitSub(self, ctx:ProjectParser.SubContext):
+        return ctx.getText()
+
+    # This will get the '**' operator
+    # Visit a parse tree produced by ProjectParser#expon.
+    def visitExpon(self, ctx: ProjectParser.ExponContext):
+        return ctx.getText()
+
+    # This will get the '//' operator  
+    # Visit a parse tree produced by ProjectParser#Sqrt.
+    def visitSqrt(self, ctx: ProjectParser.SqrtContext):
         return ctx.getText()
 
 def isValidInt(string):

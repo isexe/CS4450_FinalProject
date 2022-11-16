@@ -12,6 +12,8 @@ def main():
     print("Type Ctrl+D to run, Ctrl+Z to exit")
     usr_input = StdinStream()
     
+    print()
+
     # parse input
     # ordering is lexer -> token stream -> parser
     lexer = ProjectLexer(usr_input)
@@ -26,8 +28,8 @@ def main():
     # use visitor to traverse parse tree
     result = GrammarVisitor(debugging=True).visitCode(tree)
     
-    print("\n--- String Parse Tree ---")
-    print(tree.toStringTree())
+    # print("\n--- String Parse Tree ---")
+    # print(tree.toStringTree())
 
 if __name__ == '__main__':
     main()
