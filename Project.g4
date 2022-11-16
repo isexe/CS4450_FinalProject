@@ -57,6 +57,7 @@ val
     : '(' sum ')'
     | NUM
     | VAR
+    | ATOM
     ;
 
 // parser rules used in the equation parse rule
