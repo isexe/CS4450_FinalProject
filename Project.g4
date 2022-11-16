@@ -69,27 +69,12 @@ mod : '%' ;
 add : '+' ;
 sub : '-' ;
 
-//! DEPRECIATED
-//BAD ambigous and left/right recursion
-// expression
-//    : '(' expr=expression ')'
-//    | left=expression operator=EXPON right=expression
-//    | left=expression operator=(MULT | DIV | MOD) right=expression
-//    | left=expression operator=(ADD | SUB) right=expression
-//    | terminal=(ATOM | VAR)
-//    ;
-
-// EXPON : '**' ;
-// MULT : '*' ;
-// DIV : '/' ;
-// MOD : '%' ;
-// ADD : '+' ;
-// SUB : '-' ;
-
 // rule for defining datatypes
 ATOM
     : NUM
     | CHAR
+    | BOOL
+    | NONE
     ;
 
 // TODO currently this breaks the addition and subtraction if there isn't a space
@@ -112,6 +97,12 @@ DIGIT : [0-9] ;
 CHAR : QUOTES ([A-Za-z] | [0-9] | WS | TAB | EOL)+ QUOTES;
 
 QUOTES : '"' | '\'';
+
+// Bool
+BOOL : 'True' | 'False' ;
+
+// None
+NONE : 'None' ;
 
 // follow python naming conventions
 VAR : [A-Za-z_][0-9A-Za-z_]* ;
