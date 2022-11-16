@@ -1,5 +1,10 @@
 grammar Project;
 
+RESERVED_WORD 
+    : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' 
+    | 'if' | 'else' | 'while' | 'return' | 'null' | 'true' | 'false' | 'this' 
+    | 'new' | 'String' | 'str' | 'int' | 'float' | 'complex'| 'list' | 'tuple' | 'range'
+    | 'dict' | 'set' | 'frozenset' | 'bool' | 'bytes' | 'bytearray' | 'memoryview' | 'nonetype';
 
 // compile all the code
 code : lines* EOF ;
