@@ -65,7 +65,7 @@ ELIF: 'elif' ;
 ELSE: 'else' ;
 
 logicExpr 
-    : (NOT)? (logicVal (logicOp logicVal)*) (logicConj logicExpr)*
+    : '('? (NOT)? (logicVal (logicOp logicVal)* ) ')'? ('('? logicConj logicExpr ')'?)*
     ;
 
 logicVal
@@ -105,6 +105,7 @@ assign
 assign_val
     : VAR
     | ATOM
+    | logicExpr
     | equation
     ;
 

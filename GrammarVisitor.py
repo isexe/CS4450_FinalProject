@@ -99,7 +99,10 @@ class AssignVisitor(ProjectVisitor):
             elif(isValidFloat(r_val)):
                 r_val = float(r_val)
             elif(isValidBool(r_val)):
-                r_val = bool(r_val)
+                if(r_val == "True"):
+                    r_val = True
+                else:
+                    r_val = False
             else:
                 r_val = str(r_val)
 
@@ -174,15 +177,20 @@ class AssignVisitor(ProjectVisitor):
             elif(isValidFloat(val)):
                 val = float(val)
             elif(isValidBool(val)):
-                val = bool(val)
+                if(val == "True"):
+                    val = True
+                else:
+                    val = False
             elif(val == "None"):
                 val = None
             else:
                 val = str(val)
+        elif(ctx.logicExpr() != None):
+            return LogicVisitor().visitLogicExpr(ctx.logicExpr())  
         elif(ctx.equation() != None):
             return EquationVisitor().visitEquation(ctx.equation())
         else:
-            raise UnexpectedError("Assigned value isn't an atom or equation")
+            raise UnexpectedError("Assigned value isn't an atom, equation, or logic expression")
 
         return val
 
@@ -469,7 +477,7 @@ class IfElseBlock(ProjectVisitor):
     def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
         return self.visitChildren(ctx)
 
-    def visitIfElseCode(self, ctx: ProjectParser.IfElseCodeContext):
+    def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
         return self.visitChildren(ctx)
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
@@ -485,6 +493,10 @@ class LogicVisitor(ProjectVisitor):
     # need to handle the results from the children nodes
     def visitLogicExprChildren(self, node):
         result = None
+        sign = None
+        result_arr = []
+        and_flag = False
+        or_flag = False
         n = node.getChildCount()
         for i in range(n):
             if not self.shouldVisitNextChild(node, result):
@@ -493,7 +505,65 @@ class LogicVisitor(ProjectVisitor):
             c = node.getChild(i)
             childResult = c.accept(self)
 
-            result = self.aggregateResult(result, childResult)
+            if(childResult != None):
+                childResult = str(childResult)
+                if(isValidInt(childResult)):
+                    childResult = int(childResult)
+                elif(isValidFloat(childResult)):
+                    childResult = float(childResult)
+                elif(childResult == "and"):
+                    and_flag = True
+                    continue
+                elif(childResult == "or"):
+                    or_flag = True
+                    continue
+                elif(childResult == "False" or childResult == "True"):
+                    result_arr.append(childResult)
+                    print(result_arr)
+                    if(len(result_arr) > 2):
+                        result_arr.pop(0)
+                    if(and_flag):
+                        if("False" in result_arr):
+                            result = False
+                        else:
+                            result = True
+                    elif(or_flag):
+                        if("True" in result_arr):
+                            result = True
+                        else:
+                            result = False
+                
+                    and_flag = False
+                    or_flag = False
+                        
+
+            # if result is none just set it to the first value we found
+            if(result == None):
+                result = childResult
+            # if sign is none then the current child should be a sign operator
+            elif(sign == None):
+                sign = childResult
+            else:
+                try:
+                    if sign == "==":
+                        result = (result == childResult)
+                    elif sign == "!=":
+                        result = (result != childResult)
+                    elif sign == ">=":
+                        result = (result >= childResult)
+                    elif sign == ">":
+                        result = (result > childResult)
+                    elif sign == "<=":
+                        result = (result <= childResult)
+                    elif sign == "<":
+                        result = (result < childResult)
+                    else:
+                        UnexpectedError("Comparison was not cvalid")
+                except:
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+
+                result_arr.append(str(result))
+                sign = None
 
         return result
 
@@ -524,10 +594,6 @@ class LogicVisitor(ProjectVisitor):
         print("LogOp:\t" + ctx.getText())
         result = ctx.getText()
         return result
-
-   
-
-
 
 
 def isValidInt(string):
