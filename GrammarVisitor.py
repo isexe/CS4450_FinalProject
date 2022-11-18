@@ -14,6 +14,8 @@ sampleDict = {
 }
 
 # "stack" that variables are stored ion
+# instead of having dict of dict,
+# should create a class for variables at some point
 varDict = {}
 
 class UnexpectedError(Exception):
@@ -481,13 +483,16 @@ class IfElseBlock(ProjectVisitor):
         return self.visitChildren(ctx)
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
-        return LogicVisitor().visitLogicExpr(ctx)
+        result = LogicVisitor().visitLogicExpr(ctx)
+        return result
     
 class LogicVisitor(ProjectVisitor):
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         print("LogExpr:\t" + ctx.getText())
         result = self.visitLogicExprChildren(ctx)
+
+        print("Result of LogExpr:\t" + str(result))
         return result
 
     # need to handle the results from the children nodes
@@ -558,9 +563,9 @@ class LogicVisitor(ProjectVisitor):
                     elif sign == "<":
                         result = (result < childResult)
                     else:
-                        UnexpectedError("Comparison was not cvalid")
+                        UnexpectedError("Comparison was not valid")
                 except:
-                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(childResult) + "'")
 
                 result_arr.append(str(result))
                 sign = None
@@ -593,7 +598,7 @@ class LogicVisitor(ProjectVisitor):
         result = ctx.getText()
         return result
 
-
+# tr;y converting it to int, if fail not int
 def isValidInt(string):
     try:
         int(str(string))
@@ -601,6 +606,7 @@ def isValidInt(string):
     except:
         return False
 
+# try converting it to float, if fail not float
 def isValidFloat(string):
     try:
         float(str(string))
@@ -608,8 +614,18 @@ def isValidFloat(string):
     except:
         return False
 
+# check for True or False
 def isValidBool(string):
     if str(string) == "True" or str(string) == "False":
+        return True
+    else:
+        return False
+
+# check for quotes at front and back
+def isValidString(string):
+    if str(string)[0] == '"' and str(string)[-1] == '"':
+        return True
+    elif str(string)[0] == "'" and str(string)[-1] == "'":
         return True
     else:
         return False
