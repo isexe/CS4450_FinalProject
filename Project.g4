@@ -23,6 +23,7 @@ line : statement EOL ;
 // with the addition of declare make sure to keep equation at the bottom
 statement 
     : assign
+    | logicExpr
     | equation
     ;
 

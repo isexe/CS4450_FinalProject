@@ -175,6 +175,26 @@ class AssignVisitor(ProjectVisitor):
 
         return val
 
+class LogicVisitor(ProjectVisitor):
+
+    def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
+        result = self.visitLogicExprChildren(ctx)
+        return result
+
+    def visitLogicExprChildren(self, node):
+        n = node.getChildCount()
+        print(n)
+        return node.GetText()
+
+    def visitLogicConj(self, ctx: ProjectParser.LogicConjContext):
+        return ctx.GetText()
+    
+    def visitLogicVal(self, ctx: ProjectParser.LogicValContext):
+        return ctx.GetText()
+
+    def visitLogicOp(self, ctx:ProjectParser.LogicOpContext):
+        return ctx.GetText()
+
 class EquationVisitor(ProjectVisitor):
 
     # Step 1: 
@@ -408,7 +428,6 @@ class EquationVisitor(ProjectVisitor):
             result = ctx.ATOM()
 
         return result
-
 
     # This will get the '*' operator
     # Visit a parse tree produced by ProjectParser#mult.
