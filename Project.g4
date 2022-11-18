@@ -65,7 +65,7 @@ ELIF: 'elif' ;
 ELSE: 'else' ;
 
 logicExpr 
-    : '('? (NOT)? (logicVal (logicOp logicVal)* ) ')'? ('('? logicConj logicExpr ')'?)*
+    : '('? (NOT)? (logicVal (logicOp logicVal)*) ')'? (logicConj '('? logicExpr ')'?)*
     ;
 
 logicVal
