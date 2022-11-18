@@ -65,13 +65,13 @@ ELIF: 'elif' ;
 ELSE: 'else' ;
 
 logicExpr 
-    : logicVal (logicOp logicVal)* (logicConj logicExpr)*
+    : (NOT)? (logicVal (logicOp logicVal)*) (logicConj logicExpr)*
     ;
 
 logicVal
-    : (NOT)? VAR
-    | (NOT)? ATOM 
-    | (NOT)? equation
+    : VAR
+    | ATOM 
+    | equation
     ;
 
 logicOp

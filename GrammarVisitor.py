@@ -34,6 +34,9 @@ class GrammarVisitor(ProjectVisitor):
     def visitLine(self, ctx:ProjectParser.LineContext):
         return self.visitChildren(ctx)
 
+    # Visit a parse tree produced by ProjectParser#block.
+    def visitBlock(self, ctx: ProjectParser.BlockContext):
+        return self.visitChildren(ctx)
 
     # Visit a parse tree produced by ProjectParser#statement.
     # Will direct to visit parse rule
@@ -58,6 +61,14 @@ class GrammarVisitor(ProjectVisitor):
             print("Assign '" + str(ctx.getText()) + "':")
             print(result)
 
+        return result
+
+    def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
+        result = IfElseBlock().visitIfElseBlock(ctx)
+
+        if(self.debugging):
+            print("IfElseStatement:\t" + str(result))
+        
         return result
 
 class AssignVisitor(ProjectVisitor):
@@ -174,26 +185,6 @@ class AssignVisitor(ProjectVisitor):
             raise UnexpectedError("Assigned value isn't an atom or equation")
 
         return val
-
-class LogicVisitor(ProjectVisitor):
-
-    def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
-        result = self.visitLogicExprChildren(ctx)
-        return result
-
-    def visitLogicExprChildren(self, node):
-        n = node.getChildCount()
-        print(n)
-        return node.GetText()
-
-    def visitLogicConj(self, ctx: ProjectParser.LogicConjContext):
-        return ctx.GetText()
-    
-    def visitLogicVal(self, ctx: ProjectParser.LogicValContext):
-        return ctx.GetText()
-
-    def visitLogicOp(self, ctx:ProjectParser.LogicOpContext):
-        return ctx.GetText()
 
 class EquationVisitor(ProjectVisitor):
 
@@ -464,6 +455,80 @@ class EquationVisitor(ProjectVisitor):
     # Visit a parse tree produced by ProjectParser#Sqrt.
     def visitSqrt(self, ctx: ProjectParser.SqrtContext):
         return ctx.getText()
+
+class IfElseBlock(ProjectVisitor):
+    def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
+        return self.visitChildren(ctx)
+
+    def visitIfStatement(self, ctx: ProjectParser.IfStatementContext):
+        return self.visitChildren(ctx)
+
+    def visitElifStatement(self, ctx: ProjectParser.ElifStatementContext):
+        return self.visitChildren(ctx)
+
+    def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
+        return self.visitChildren(ctx)
+
+    def visitIfElseCode(self, ctx: ProjectParser.IfElseCodeContext):
+        return self.visitChildren(ctx)
+
+    def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
+        return LogicVisitor().visitLogicExpr(ctx)
+    
+class LogicVisitor(ProjectVisitor):
+
+    def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
+        print("LogExpr:\t" + ctx.getText())
+        result = self.visitLogicExprChildren(ctx)
+        return result
+
+    # need to handle the results from the children nodes
+    def visitLogicExprChildren(self, node):
+        result = None
+        n = node.getChildCount()
+        for i in range(n):
+            if not self.shouldVisitNextChild(node, result):
+                return result
+
+            c = node.getChild(i)
+            childResult = c.accept(self)
+
+            result = self.aggregateResult(result, childResult)
+
+        return result
+
+    def visitLogicConj(self, ctx: ProjectParser.LogicConjContext):
+        print("LogCong:\t" + ctx.getText())
+        result = ctx.getText()
+        return result
+    
+    def visitLogicVal(self, ctx: ProjectParser.LogicValContext):
+        result = None
+        if(ctx.VAR()):
+            # TODO handle if var is used
+            pass
+        elif(ctx.ATOM()):
+            result = ctx.ATOM()
+
+
+
+        elif(ctx.equation() != None):
+            result = EquationVisitor().visitEquation(ctx.equation())
+
+        # print("LogVal:\t" + ctx.getText() + " = " + str(result))
+        print("LogVal:\t" + ctx.getText())
+
+        return result
+
+    def visitLogicOp(self, ctx:ProjectParser.LogicOpContext):
+        print("LogOp:\t" + ctx.getText())
+        result = ctx.getText()
+        return result
+
+   
+
+
+
 
 def isValidInt(string):
     try:
