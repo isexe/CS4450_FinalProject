@@ -38,19 +38,26 @@ ifElseBlock :
     (elseStatement)?
     ;
 
+
 ifStatement
-    : (IF ('(') logicExpr ('):')) EOL 
-        (TAB line)+
+    : ((IF logicExpr (':')) EOL 
+    | (IF ('(') logicExpr ('):')) EOL )
+        ifElseCode
     ;
 
 elifStatement
-    : (ELIF ('(') logicExpr ('):')) EOL 
-        (TAB line)+
+    : ((ELIF logicExpr (':')) EOL 
+    | (ELIF ('(') logicExpr ('):')) EOL )
+        ifElseCode
     ;
 
 elseStatement
     : ELSE (':') EOL
-        (TAB line)+
+        ifElseCode
+    ;
+
+ifElseCode
+    : (TAB line)+
     ;
 
 IF: 'if' ;
@@ -58,7 +65,7 @@ ELIF: 'elif' ;
 ELSE: 'else' ;
 
 logicExpr 
-    : logicVal (logicOp logicVal)? (logicConj logicExpr)?
+    : logicVal (logicOp logicVal)* (logicConj logicExpr)*
     ;
 
 logicVal
