@@ -575,13 +575,11 @@ class LogicVisitor(ProjectVisitor):
     def visitLogicVal(self, ctx: ProjectParser.LogicValContext):
         result = None
         if(ctx.VAR()):
-            # TODO handle if var is used
-            pass
+            result = varDict.get(str(ctx.VAR()))
+            if(result == None):
+                raise NameError("name '" + str(ctx.VAR()) + "' is not defined")
         elif(ctx.ATOM()):
             result = ctx.ATOM()
-
-
-
         elif(ctx.equation() != None):
             result = EquationVisitor().visitEquation(ctx.equation())
 
