@@ -488,10 +488,14 @@ class IfElseBlock(ProjectVisitor):
             
             c = node.getChild(i)
             result = c.accept(self)
+
+            print("childresult" + str(result))
         
-            if(result != None):
-                if(isValidBool(result)):
-                    result = bool(result)
+            if(logVal != None):
+                if(str(logVal) == "True"):
+                    logVal = True
+                elif(str(logVal) == "False"):
+                    logVal = False
                 
                 if(result):
                     break
@@ -508,11 +512,11 @@ class IfElseBlock(ProjectVisitor):
         result = None
         logVal = self.visitLogicExpr(ctxLogic)
 
-        #make result bool
-
         if(logVal != None):
-            if(isValidBool(logVal)):
-                logVal = bool(logVal)
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
 
         if(logVal):
             result = self.visitIfElseCode(ctxCode)
@@ -529,8 +533,10 @@ class IfElseBlock(ProjectVisitor):
         #make result bool
 
         if(logVal != None):
-            if(isValidBool(logVal)):
-                logVal = bool(logVal)
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
 
         if(logVal):
             result = self.visitIfElseCode(ctxCode)
