@@ -467,32 +467,42 @@ class EquationVisitor(ProjectVisitor):
         return ctx.getText()
 
 class IfElseBlock(ProjectVisitor):
+    # This ctx is the parent of all the ifelseblock code, has statement and code sections
+    # need to visit children
+    # start with if then go through each block
+    # break if one returns true
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
         return self.visitChildren(ctx)
 
+    # Need to visit children
+    # if child(logicExpr) and if true, visit child(ifElseCode)
+    # need to return the value from logicExpr
     def visitIfStatement(self, ctx: ProjectParser.IfStatementContext):
+        # print(ctx.getText())
         return self.visitChildren(ctx)
 
     def visitElifStatement(self, ctx: ProjectParser.ElifStatementContext):
+        # print(ctx.getText())
         return self.visitChildren(ctx)
 
     def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
+        # print(ctx.getText())
         return self.visitChildren(ctx)
 
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
+        # print(ctx.getText())
         return self.visitChildren(ctx)
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
+        print("LogExpr:\t" + ctx.getText())
         result = LogicVisitor().visitLogicExpr(ctx)
+        print("Result:\t" + str(result))
         return result
     
 class LogicVisitor(ProjectVisitor):
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
-        print("LogExpr:\t" + ctx.getText())
         result = self.visitLogicExprChildren(ctx)
-
-        print("Result of LogExpr:\t" + str(result))
         return result
 
     # need to handle the results from the children nodes
@@ -524,7 +534,7 @@ class LogicVisitor(ProjectVisitor):
                     continue
                 elif(childResult == "False" or childResult == "True"):
                     result_arr.append(childResult)
-                    print(result_arr)
+                    # print(result_arr)
                     if(len(result_arr) > 2):
                         result_arr.pop(0)
                     if(and_flag):
@@ -573,7 +583,7 @@ class LogicVisitor(ProjectVisitor):
         return result
 
     def visitLogicConj(self, ctx: ProjectParser.LogicConjContext):
-        print("LogCong:\t" + ctx.getText())
+        # print("LogCong:\t" + ctx.getText())
         result = ctx.getText()
         return result
     
@@ -589,12 +599,12 @@ class LogicVisitor(ProjectVisitor):
             result = EquationVisitor().visitEquation(ctx.equation())
 
         # print("LogVal:\t" + ctx.getText() + " = " + str(result))
-        print("LogVal:\t" + ctx.getText())
+        # print("LogVal:\t" + ctx.getText())
 
         return result
 
     def visitLogicOp(self, ctx:ProjectParser.LogicOpContext):
-        print("LogOp:\t" + ctx.getText())
+        # print("LogOp:\t" + ctx.getText())
         result = ctx.getText()
         return result
 
