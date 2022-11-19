@@ -554,7 +554,7 @@ class IfElseBlock(ProjectVisitor):
             result = c.accept(self)
         
             if(result != None):
-                c.visitLine()
+                self.visitLine(c)
 
         return result
 
