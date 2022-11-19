@@ -544,18 +544,13 @@ class IfElseBlock(ProjectVisitor):
 
     def visitIfElseCode(self, ctx: ProjectParser.IfElseCodeContext):
         n = ctx.getChildCount()
-        result =  None
+        result = None
 
         for i in range(n):
-            if not self.shouldVisitNextChild(ctx, result):
-                return result
-            
             c = ctx.getChild(i)
-            result = c.accept(self)
-        
-            if(result != None):
-                self.visitLine(c)
 
+            result = GrammarVisitor().visit(c)
+        
         return result
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
