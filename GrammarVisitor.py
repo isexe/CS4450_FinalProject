@@ -502,31 +502,43 @@ class IfElseBlock(ProjectVisitor):
     # if child(logicExpr) and if true, visit child(ifElseCode)
     # need to return the value from logicExpr
     def visitIfStatement(self, ctx: ProjectParser.IfStatementContext):
-        ctxLogic = ctx.getChild(0)
-        ctxCode = ctx.getChild(1)
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.ifElseCode()
 
-        result = self.visit(ctxLogic)
+        result = None
+        logVal = self.visitLogicExpr(ctxLogic)
 
         #make result bool
 
-        if(bool(result)):
-            result = self.visit(ctxCode)
+        if(logVal != None):
+            if(isValidBool(logVal)):
+                logVal = bool(logVal)
+
+        if(logVal):
+            result = self.visitIfElseCode(ctxCode)
 
         return result
 
     def visitElifStatement(self, ctx: ProjectParser.ElifStatementContext):
-        # print(ctx.getText())
-        ctxLogic = ctx.getChild(0)
-        ctxCode = ctx.getChild(1)
-        result = self.visit(ctxLogic)
-        
-        if(bool(result)):
-            result = self.visit(ctxCode)
-        
-        return result 
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.ifElseCode()
+
+        result = None
+        logVal = self.visitLogicExpr(ctxLogic)
+
+        #make result bool
+
+        if(logVal != None):
+            if(isValidBool(logVal)):
+                logVal = bool(logVal)
+
+        if(logVal):
+            result = self.visitIfElseCode(ctxCode)
+
+        return result
 
     def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
-        ctxCode = ctx.getChild(0)
+        ctxCode = ctx.ifElseCode()
         result = self.visitIfElseCode(ctxCode)
         return result
 
