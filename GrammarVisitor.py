@@ -539,8 +539,8 @@ class IfElseBlock(ProjectVisitor):
 
     def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
         ctxCode = ctx.ifElseCode()
-        result = self.visitIfElseCode(ctxCode)
-        return result
+        self.visitIfElseCode(ctxCode)
+        return None
 
     def visitIfElseCode(self, ctx: ProjectParser.IfElseCodeContext):
         n = ctx.getChildCount()
