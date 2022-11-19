@@ -510,7 +510,7 @@ class IfElseBlock(ProjectVisitor):
         #make result bool
 
         if(bool(result)):
-            self.visit(ctxCode)
+            result = self.visit(ctxCode)
 
         return result
 
@@ -521,8 +521,7 @@ class IfElseBlock(ProjectVisitor):
         result = self.visit(ctxLogic)
         
         if(bool(result)):
-            self.visit(ctxCode)
-
+            result = self.visit(ctxCode)
         
         return result 
 
