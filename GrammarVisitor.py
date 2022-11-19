@@ -472,6 +472,7 @@ class IfElseBlock(ProjectVisitor):
     # start with if then go through each block
     # break if one returns true
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
+
         return self.visitChildren(ctx)
 
     # Need to visit children
@@ -480,14 +481,26 @@ class IfElseBlock(ProjectVisitor):
     def visitIfStatement(self, ctx: ProjectParser.IfStatementContext):
         # print(ctx.getText())
         return self.visitChildren(ctx)
+            
+
 
     def visitElifStatement(self, ctx: ProjectParser.ElifStatementContext):
         # print(ctx.getText())
-        return self.visitChildren(ctx)
+        ctxLogic = ctx.getChild(0)
+        ctxCode = ctx.getChild(1)
+        result = ctx.visit(ctxLogic)
+        
+        if bool(result) != False:
+            ctx.visit(ctxCode)
+
+        
+        return result 
 
     def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
         # print(ctx.getText())
-        return self.visitChildren(ctx)
+        ctxCode = ctx.getChild(0)
+        result = ctx.visit(ctxCode)
+        return bool(result)
 
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
         # print(ctx.getText())
