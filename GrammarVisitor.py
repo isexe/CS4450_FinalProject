@@ -514,7 +514,15 @@ class IfElseBlock(ProjectVisitor):
 
     def visitElifStatement(self, ctx: ProjectParser.ElifStatementContext):
         # print(ctx.getText())
-        return self.visitChildren(ctx)
+        ctxLogic = ctx.getChild(0)
+        ctxCode = ctx.getChild(1)
+        result = ctx.visit(ctxLogic)
+        
+        if bool(result) != False:
+            ctx.visit(ctxCode)
+
+        
+        return result 
 
     def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
         # print(ctx.getText())
