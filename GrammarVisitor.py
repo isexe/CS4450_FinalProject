@@ -472,7 +472,29 @@ class IfElseBlock(ProjectVisitor):
     # start with if then go through each block
     # break if one returns true
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
-        return self.visitChildren(ctx)
+        result = self.visitIfElseBlockChildren(ctx)
+        return result
+
+    # Visit the children of a parse tree produced by ProjectParser#equation.
+    def visitIfElseBlockChildren(self, node):
+        result = self.defaultResult
+        n = node.getChildCount()
+
+        for i in range(n):
+            if not self.shouldVisitNextChild(node, result):
+                return result
+            
+            c = node.getChild(i)
+            result = c.accept(self)
+        
+            if(result != None):
+                if(isValidBool(result)):
+                    result = bool(result)
+                
+                if(result):
+                    break
+                
+        return result
 
     # Need to visit children
     # if child(logicExpr) and if true, visit child(ifElseCode)
@@ -480,6 +502,7 @@ class IfElseBlock(ProjectVisitor):
     def visitIfStatement(self, ctx: ProjectParser.IfStatementContext):
         # print(ctx.getText())
         return self.visitChildren(ctx)
+
 
     def visitElifStatement(self, ctx: ProjectParser.ElifStatementContext):
         # print(ctx.getText())
@@ -518,7 +541,7 @@ class LogicVisitor(ProjectVisitor):
                 return result
 
             c = node.getChild(i)
-            childResult = c.accept(self)
+            S = c.accept(self)
 
             if(childResult != None):
                 childResult = str(childResult)
