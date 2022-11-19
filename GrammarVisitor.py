@@ -493,16 +493,24 @@ class IfElseBlock(ProjectVisitor):
                 
                 if(result):
                     break
-                
+
         return result
 
     # Need to visit children
     # if child(logicExpr) and if true, visit child(ifElseCode)
     # need to return the value from logicExpr
     def visitIfStatement(self, ctx: ProjectParser.IfStatementContext):
-        # print(ctx.getText())
-        return self.visitChildren(ctx)
+        ctxLogic = ctx.getChild(0)
+        ctxCode = ctx.getChild(1)
 
+        result = ctx.visit(ctxLogic)
+
+        #make result bool
+
+        if(result):
+            ctx.visit(ctxCode)
+
+        return result
 
     def visitElifStatement(self, ctx: ProjectParser.ElifStatementContext):
         # print(ctx.getText())
@@ -512,9 +520,20 @@ class IfElseBlock(ProjectVisitor):
         # print(ctx.getText())
         return self.visitChildren(ctx)
 
-    def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
-        # print(ctx.getText())
-        return self.visitChildren(ctx)
+    def visitIfElseCode(self, ctx: ProjectParser.IfElseCodeContext):
+        n = ctx.getChildCount()
+
+        for i in range(n):
+            if not self.shouldVisitNextChild(ctx, result):
+                return result
+            
+            c = ctx.getChild(i)
+            result = c.accept(self)
+        
+            if(result != None):
+                c.visitLine()
+
+        return result
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         print("LogExpr:\t" + ctx.getText())

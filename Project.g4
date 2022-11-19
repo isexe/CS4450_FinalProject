@@ -1,6 +1,6 @@
 grammar Project;
 
-// information on how to reserve words that variables can't use was found at resource #5
+// information on how to reserve words that variables ca not use was found at resource #5
 // as you need to use these remove them from list and insert them in the section you used them
 // i.e. if section now has lexer rule for IF and ELSE
 RESERVED_WORD 
