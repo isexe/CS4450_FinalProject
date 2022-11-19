@@ -517,7 +517,7 @@ class IfElseBlock(ProjectVisitor):
         if(logVal):
             result = self.visitIfElseCode(ctxCode)
 
-        return result
+        return logVal
 
     def visitElifStatement(self, ctx: ProjectParser.ElifStatementContext):
         ctxLogic = ctx.logicExpr()
@@ -535,7 +535,7 @@ class IfElseBlock(ProjectVisitor):
         if(logVal):
             result = self.visitIfElseCode(ctxCode)
 
-        return result
+        return logVal
 
     def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
         ctxCode = ctx.ifElseCode()
