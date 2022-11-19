@@ -491,11 +491,11 @@ class IfElseBlock(ProjectVisitor):
 
             print("childresult" + str(result))
         
-            if(logVal != None):
-                if(str(logVal) == "True"):
-                    logVal = True
-                elif(str(logVal) == "False"):
-                    logVal = False
+            if(result != None):
+                if(str(result) == "True"):
+                    result = True
+                elif(str(result) == "False"):
+                    result = False
                 
                 if(result):
                     break
