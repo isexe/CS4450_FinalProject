@@ -71,6 +71,8 @@ class GrammarVisitor(ProjectVisitor):
         if(self.debugging):
             print("IfElseStatement:\t" + str(result))
         
+        print(varDict)
+
         return result
 
 class AssignVisitor(ProjectVisitor):
@@ -477,7 +479,7 @@ class IfElseBlock(ProjectVisitor):
 
     # Visit the children of a parse tree produced by ProjectParser#equation.
     def visitIfElseBlockChildren(self, node):
-        result = self.defaultResult
+        result = None
         n = node.getChildCount()
 
         for i in range(n):
@@ -503,12 +505,12 @@ class IfElseBlock(ProjectVisitor):
         ctxLogic = ctx.getChild(0)
         ctxCode = ctx.getChild(1)
 
-        result = ctx.visit(ctxLogic)
+        result = self.visit(ctxLogic)
 
         #make result bool
 
-        if(result):
-            ctx.visit(ctxCode)
+        if(bool(result)):
+            self.visit(ctxCode)
 
         return result
 
@@ -516,20 +518,22 @@ class IfElseBlock(ProjectVisitor):
         # print(ctx.getText())
         ctxLogic = ctx.getChild(0)
         ctxCode = ctx.getChild(1)
-        result = ctx.visit(ctxLogic)
+        result = self.visit(ctxLogic)
         
-        if bool(result) != False:
-            ctx.visit(ctxCode)
+        if(bool(result)):
+            self.visit(ctxCode)
 
         
         return result 
 
     def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
-        # print(ctx.getText())
-        return self.visitChildren(ctx)
+        ctxCode = ctx.getChild(0)
+        result = self.visitIfElseCode(ctxCode)
+        return result
 
     def visitIfElseCode(self, ctx: ProjectParser.IfElseCodeContext):
         n = ctx.getChildCount()
+        result =  None
 
         for i in range(n):
             if not self.shouldVisitNextChild(ctx, result):
