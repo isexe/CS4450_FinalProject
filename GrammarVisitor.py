@@ -568,7 +568,7 @@ class LogicVisitor(ProjectVisitor):
                 return result
 
             c = node.getChild(i)
-            S = c.accept(self)
+            childResult = c.accept(self)
 
             if(childResult != None):
                 childResult = str(childResult)
