@@ -578,6 +578,7 @@ class LogicVisitor(ProjectVisitor):
         result_arr = []
         and_flag = False
         or_flag = False
+        not_flag = False
         n = node.getChildCount()
         for i in range(n):
             if not self.shouldVisitNextChild(node, result):
@@ -598,12 +599,16 @@ class LogicVisitor(ProjectVisitor):
                 elif(childResult == "or"):
                     or_flag = True
                     continue
+                elif(childResult == "not"):
+                    not_flag = True
+                    continue
                 elif(childResult == "False" or childResult == "True"):
                     result_arr.append(childResult)
-                    # print(result_arr)
+                    print(result_arr)
                     if(len(result_arr) > 2):
                         result_arr.pop(0)
                     if(and_flag):
+                        print("and flag called")
                         if("False" in result_arr):
                             result = False
                         else:
@@ -613,9 +618,16 @@ class LogicVisitor(ProjectVisitor):
                             result = True
                         else:
                             result = False
+                    elif(not_flag):
+                        print("not flag called")
+                        if("True" in result_arr):
+                            result = False
+                        else:
+                            result = True
                 
                     and_flag = False
                     or_flag = False
+                    not_flag = False
                         
 
             # if result is none just set it to the first value we found
@@ -659,6 +671,8 @@ class LogicVisitor(ProjectVisitor):
             result = varDict.get(str(ctx.VAR()))
             if(result == None):
                 raise NameError("name '" + str(ctx.VAR()) + "' is not defined")
+            if(result != None):
+                result = result.get("Value")
         elif(ctx.ATOM()):
             result = ctx.ATOM()
         elif(ctx.equation() != None):
