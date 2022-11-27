@@ -585,10 +585,15 @@ class LogicVisitor(ProjectVisitor):
                 return result
 
             c = node.getChild(i)
+            if(c.getText() == "not"):
+                not_flag = True
+                print("not flag called")
+                continue
             childResult = c.accept(self)
 
             if(childResult != None):
                 childResult = str(childResult)
+                print("ChildResult "+childResult)
                 if(isValidInt(childResult)):
                     childResult = int(childResult)
                 elif(isValidFloat(childResult)):
@@ -598,9 +603,6 @@ class LogicVisitor(ProjectVisitor):
                     continue
                 elif(childResult == "or"):
                     or_flag = True
-                    continue
-                elif(childResult == "not"):
-                    not_flag = True
                     continue
                 elif(childResult == "False" or childResult == "True"):
                     result_arr.append(childResult)
@@ -614,6 +616,7 @@ class LogicVisitor(ProjectVisitor):
                         else:
                             result = True
                     elif(or_flag):
+                        print("or flag called")
                         if("True" in result_arr):
                             result = True
                         else:
@@ -625,9 +628,9 @@ class LogicVisitor(ProjectVisitor):
                         else:
                             result = True
                 
-                    and_flag = False
-                    or_flag = False
-                    not_flag = False
+            and_flag = False
+            or_flag = False
+            not_flag = False
                         
 
             # if result is none just set it to the first value we found
