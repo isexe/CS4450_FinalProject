@@ -69,9 +69,14 @@ class GrammarVisitor(ProjectVisitor):
         result = IfElseBlock().visitIfElseBlock(ctx)
 
         if(self.debugging):
-            print("IfElseStatement:\t" + str(result))
+            # try to print which statement it would execute, but returns last statement even if none were executed
+            print("IfElseStatement:")
+            if(result != None):
+                print(str(result + 1))
+            else:
+                print("None")
         
-        print(varDict)
+        # print(varDict)
 
         return result
 
@@ -271,7 +276,7 @@ class EquationVisitor(ProjectVisitor):
                     # reset sign value so we know it's next
                     
                 except:
-                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + str(type(result)) + "' and '" + str(type(childResult)) + "'")
                     
                 sign = None
         return result
@@ -326,7 +331,7 @@ class EquationVisitor(ProjectVisitor):
                     else:
                         raise UnexpectedError("Multiplication/Division/Modulo sign was value other than '*', '/', '%'")
                 except:
-                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + str(type(result)) + "' and '" + str(type(childResult)) + "'")
                 
                 sign = None
 
@@ -369,7 +374,7 @@ class EquationVisitor(ProjectVisitor):
                     else:
                         raise UnexpectedError("Power/Square sign was value other than '**', '//'")
                 except:
-                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + str(type(result)) + "' and '" + str(type(childResult)) + "'")
                 
                 sign = None
 
@@ -400,12 +405,12 @@ class EquationVisitor(ProjectVisitor):
                 try:
                     result = -result
                 except:
-                    raise TypeError("bad operand type for unary -: " + type(result))
+                    raise TypeError("bad operand type for unary -: " + str(type(result)))
             elif(ctx.sign.text == "+"):
                 try:
                     result = +result
                 except:
-                    raise TypeError("bad operand type for unary +: " + type(result))
+                    raise TypeError("bad operand type for unary +: " + str(type(result)))
 
         return result
 
@@ -489,7 +494,7 @@ class IfElseBlock(ProjectVisitor):
             c = node.getChild(i)
             result = c.accept(self)
 
-            print("childresult" + str(result))
+            # print("childresult" + str(result))
         
             if(result != None):
                 if(str(result) == "True"):
@@ -498,6 +503,7 @@ class IfElseBlock(ProjectVisitor):
                     result = False
                 
                 if(result):
+                    result = i
                     break
 
         return result
@@ -560,9 +566,9 @@ class IfElseBlock(ProjectVisitor):
         return result
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
-        print("LogExpr:\t" + ctx.getText())
+        # print("LogExpr:\t" + ctx.getText())
         result = LogicVisitor().visitLogicExpr(ctx)
-        print("Result:\t" + str(result))
+        # print("Result:\t" + str(result))
         return result
     
 class LogicVisitor(ProjectVisitor):
@@ -587,13 +593,13 @@ class LogicVisitor(ProjectVisitor):
             c = node.getChild(i)
             if(c.getText() == "not"):
                 not_flag = True
-                print("not flag called")
+                # print("not flag called")
                 continue
             childResult = c.accept(self)
 
             if(childResult != None):
                 childResult = str(childResult)
-                print("ChildResult "+childResult)
+                # print("ChildResult "+childResult)
                 if(isValidInt(childResult)):
                     childResult = int(childResult)
                 elif(isValidFloat(childResult)):
@@ -606,23 +612,23 @@ class LogicVisitor(ProjectVisitor):
                     continue
                 elif(childResult == "False" or childResult == "True"):
                     result_arr.append(childResult)
-                    print(result_arr)
+                    # print(result_arr)
                     if(len(result_arr) > 2):
                         result_arr.pop(0)
                     if(and_flag):
-                        print("and flag called")
+                        # print("and flag called")
                         if("False" in result_arr):
                             result = False
                         else:
                             result = True
                     elif(or_flag):
-                        print("or flag called")
+                        # print("or flag called")
                         if("True" in result_arr):
                             result = True
                         else:
                             result = False
                     elif(not_flag):
-                        print("not flag called")
+                        # print("not flag called")
                         if("True" in result_arr):
                             result = False
                         else:
@@ -656,7 +662,7 @@ class LogicVisitor(ProjectVisitor):
                     else:
                         UnexpectedError("Comparison was not valid")
                 except:
-                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(childResult) + "'")
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + str(type(result)) + "' and '" + str(type(childResult)) + "'")
 
                 result_arr.append(str(result))
                 sign = None
