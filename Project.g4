@@ -60,9 +60,21 @@ ifElseCode
     : (TAB line)+
     ;
 
+whileloop
+    : ((WHILE logicExpr (':')) EOL
+    | (WHILE ('(')logicExpr('):')) EOL)
+        whileCode
+    ;
+
+whileCode
+    : (TAB line)+
+    ;
+
 IF: 'if' ;
 ELIF: 'elif' ;
 ELSE: 'else' ;
+
+WHILE: 'while';
 
 logicExpr 
     : '('? (NOT)? (logicVal (logicOp logicVal)*) ')'? (logicConj '('? logicExpr ')'?)*
