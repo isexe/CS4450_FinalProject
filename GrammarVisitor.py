@@ -778,6 +778,24 @@ class ForLoop(ProjectVisitor):
                 pass
 
         return result
+
+    def visitRangeVal(self, ctx:ProjectParser.RangeValContext):
+        result = None
+        if(ctx.VAR()):
+            result = varDict.get(str(ctx.VAR()))
+            if(result == None):
+                raise NameError("name '" + str(ctx.VAR()) + "' is not defined")
+            if(result != None):
+                result = result.get("Value")
+        elif(ctx.ATOM()):
+            result = ctx.ATOM()
+        elif(ctx.equation() != None):
+            result = EquationVisitor().visitEquation(ctx.equation())
+
+        # print("LogVal:\t" + ctx.getText() + " = " + str(result))
+        # print("LogVal:\t" + ctx.getText())
+
+        return result
     
     # should look identical to ifElseCode
     def visitForCode(self, ctx:ProjectParser.ForCodeContext):
