@@ -4,16 +4,19 @@ grammar Project;
 // as you need to use these remove them from list and insert them in the section you used them
 // i.e. if section now has lexer rule for IF and ELSE
 RESERVED_WORD 
-    : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' 
-    | 'while' | 'return' | 'null' | 'this' 
-    | 'new' | 'String' | 'str' | 'int' | 'float' | 'complex'| 'list' | 'tuple' | 'range'
+    : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' | 'return' | 'null' | 'this' 
+    | 'new' | 'String' | 'str' | 'int' | 'float' | 'complex'| 'list' | 'tuple'
     | 'dict' | 'set' | 'frozenset' | 'bool' | 'bytes' | 'bytearray' | 'memoryview' | 'nonetype';
 
 // compile all the code
 code : (block | line)* EOF ;
 
 // blocks of code
-block : ifElseBlock;
+block 
+    : ifElseBlock
+    | whileloop
+    | forLoop
+    ;
 
 // each line of code
 line : statement EOL ;
@@ -59,6 +62,10 @@ elseStatement
 ifElseCode
     : (TAB line)+
     ;
+    
+IF: 'if' ;
+ELIF: 'elif' ;
+ELSE: 'else' ;
 
 whileloop
     : ((WHILE logicExpr (':')) EOL
@@ -69,12 +76,39 @@ whileloop
 whileCode
     : (TAB line)+
     ;
-
-IF: 'if' ;
-ELIF: 'elif' ;
-ELSE: 'else' ;
-
+    
 WHILE: 'while';
+
+// this works, but is super ugly
+forLoop
+    : (FOR id IN RANGE ('(') range ('):')) EOL
+        forCode
+    ;
+
+// can have up to three params
+// could change to just equation, but logicVal allows for shorter parse tree
+range
+    :  logicVal (',' logicVal (',' logicVal)?)?
+    ;
+
+// forLoop
+//     : (FOR id IN RANGE '(' rangeParam '):') EOL
+//         forCode
+//     ;
+
+// rangeParam
+//     : stop=equation
+//     | start=equation ',' stop=equation
+//     | start=equation ',' stop=equation ',' step=equation
+//     ;
+
+forCode
+    : (TAB line)+
+    ;
+
+FOR: 'for';
+IN: 'in';
+RANGE: 'range';
 
 logicExpr 
     : '('? (NOT)? (logicVal (logicOp logicVal)*) ')'? (logicConj '('? logicExpr ')'?)*
@@ -196,8 +230,6 @@ BOOL : 'True' | 'False' ;
 
 // None
 NONE : 'None' ;
-
-
 
 // TODO need to include much more than this
 STRING : QUOTES (CHAR | DIGIT | WS | TAB | EOL)+ QUOTES;
