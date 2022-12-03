@@ -86,6 +86,7 @@ forLoop
     ;
 
 // can have up to three params
+// could change to just equation, but logicVal allows for shorter parse tree
 range
     :  logicVal (',' logicVal (',' logicVal)?)?
     ;
