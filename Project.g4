@@ -62,21 +62,25 @@ ifElseCode
 whileloop
     : ((WHILE logicExpr (':')) EOL
     | (WHILE ('(')logicExpr('):')) EOL)
-        loopCode
+        whileCode
     ;
 
-loopCode
+whileCode
     : (TAB line)+
     ;
 
-range
-    : (RANGE '(' (VAR) (',' VAR)? (',' VAR)?)
+forLoop
+    : ((FOR id IN range (':')) EOL
+    | (FOR ('(') id IN range (')')) EOL)
+        forCode
     ;
 
-forLoop
-    : ((FOR VAR IN RANGE (':')) EOL
-    | (FOR ('(') VAR IN RANGE (')')) EOL)
-        loopCode
+range
+    : (RANGE '(' (logicVal) (',' logicVal)? (',' logicVal)?)
+    ;
+
+forCode
+    : (TAB line)+
     ;
 
 IF: 'if' ;

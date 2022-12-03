@@ -697,6 +697,48 @@ class LogicVisitor(ProjectVisitor):
         result = ctx.getText()
         return result
 
+class ForBlock(ProjectVisitor):
+
+    def visitForLoop(self, ctx:ProjectParser.ForLoopContext):
+        result = self.visitForLoopChildren(ctx)
+        return result
+
+    def visitForLoopChildren(self, node):
+        result = None
+        n = node.getChildCount()
+        for i in range(n):
+            if not self.shouldVisitNextChild(node, result):
+                return result
+
+            c = node.getChild(i)
+            result = c.accept(self)
+
+    def visitRange(self, ctx:ProjectParser.RangeContext):
+        result = self.visitRangeChildren(ctx)
+        return result
+    
+    def visitRangeChildren(self, node):
+        result = None
+        n = node.getChildCount()
+        for i in range(n):
+            if not self.shouldVisitNextChild(node, result):
+                return result
+
+            c = node.getChild(i)
+            result = c.accept(self)
+    
+    def visitForCode(self, ctx:ProjectParser.ForCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor().visit(c)
+        
+        return result
+            
+
 # tr;y converting it to int, if fail not int
 def isValidInt(string):
     try:
