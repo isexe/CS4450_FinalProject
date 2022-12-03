@@ -759,9 +759,33 @@ class ForLoop(ProjectVisitor):
             c = ctx.getChild(i)
 
             result = GrammarVisitor().visit(c)
-        
         return result
             
+class WhileLoop(ProjectVisitor):
+    def visitWhileLoop(self, ctx:ProjectParser.WhileLoopContext):
+        result = self.visitWhileLoopChildren(ctx)
+        return result
+
+    def visitWhileLoopChildren(self, node):
+        result = None
+        n = node.getChildCount()
+        for i in range(n):
+            if not self.shouldVisitNextChild(node, result):
+                return result
+
+            c = node.getChild(i)
+            result = c.accept(self)
+
+            # need to get id and store as var
+            # need to get range values and store in array
+
+            if(result != None):
+                pass
+
+        # set start, end, and step values according to size of array
+
+        # do whileCode with whileloop using those previous values and id
+
 
 # try converting it to int, if fail not int
 def isValidInt(string):
