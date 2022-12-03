@@ -730,18 +730,25 @@ class ForLoopVisitor(ProjectVisitor):
 
     def visitForLoop(self, ctx:ProjectParser.ForLoopContext):
         result = None
+        var_val = None
 
         ctx_id = ctx.id_()
         ctx_range = ctx.range_()
 
-        result_id = self.visitId(ctx_id)
         result_range = self.visitRange(ctx_range)
+        result_id = self.visitId(ctx_id)
 
         print(result_id)
         print(result_range)
 
-        # get id val
+        if len(result_range) == 1:
+            var_val = 0
+        else:
+            var_val = result_range[0]
 
+        val = { "Address" :id(var_val), "Value" : var_val, "Type" : type(var_val), "Lifetime" : "", "Scope" : ""}
+        varDict[str(ctx_id)] = val
+        print(varDict[str(ctx_id)])
 
         if(len(result_range) == 1):
             stop = result_range[0]
@@ -772,11 +779,6 @@ class ForLoopVisitor(ProjectVisitor):
 
     def visitId(self, ctx: ProjectParser.IdContext):
         result = ctx.VAR()
-
-        # look for var and return reference
-
-        # if not found create var and return reference
-
         return result
 
     def visitRange(self, ctx:ProjectParser.RangeContext):
