@@ -762,6 +762,7 @@ class ForLoop(ProjectVisitor):
         min_value = None
         max_value = None
         increment_value = None
+        result_arr = []
         n = node.getChildCount()
         for i in range(n):
             if not self.shouldVisitNextChild(node, result):
@@ -770,14 +771,32 @@ class ForLoop(ProjectVisitor):
             c = node.getChild(i)
             debug_var = c.getText()
             result = c.accept(self)
-            print(str(result))
+
+            if isValidInt(str(result)):
+                if min_value == None:
+                    min_value = int(str(result))
+                elif max_value == None:
+                    max_value = int(str(result))
+                else:
+                    increment_value = int(str(result))
+
+            if i == (n - 1):
+                if max_value == None:
+                    max_value = min_value
+                    min_value = 0
+                if increment_value == None:
+                    increment_value = 1
+                
+                for x in range(min_value, max_value, increment_value):
+                    result_arr.append(x)
+
 
             if(result != None):
                 # result should be logicVal
                 # VAR, ATOM, or equation
                 pass
 
-        return result
+        return result_arr
 
     def visitRangeVal(self, ctx:ProjectParser.RangeValContext):
         result = None
