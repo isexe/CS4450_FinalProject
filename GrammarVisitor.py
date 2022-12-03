@@ -792,20 +792,11 @@ class WhileLoop(ProjectVisitor):
         return result
 
     def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
-        ctxLogic = ctx.logicExpr()
-        ctxCode = ctx.ifElseCode()
-
-        result = None
-        logVal = self.visitLogicExpr(ctxLogic)
-
-        if(logVal != None):
-            if(str(logVal) == "True"):
-                logVal = True
-            elif(str(logVal) == "False"):
-                logVal = False
+        logVal = True
+        logVal = whileLooping()
 
         if(logVal):
-            result = self.visitWhileCode(ctxCode)
+           visitWhileStatement()
 
         return logVal
 
@@ -821,11 +812,20 @@ class WhileLoop(ProjectVisitor):
         return result
 
     def whileLooping(self, ctx: ProjectParser.WhileLoopingContext):
-        logVal = True
-        logVal = visitWhileStatement()
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.ifElseCode()
+
+        result = None
+        logVal = self.visitLogicExpr(ctxLogic)
+
+        if(logVal != None):
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
 
         if(logVal):
-            whileLoop()
+            result = self.visitWhileCode(ctxCode)
 
         return logVal
 
