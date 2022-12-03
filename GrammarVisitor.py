@@ -84,7 +84,9 @@ class GrammarVisitor(ProjectVisitor):
         result = ForLoop().visitForLoop(ctx)
 
         if(self.debugging):
+            print("For loop running")
             # print some debugging statement
+            pass
 
         return result
 
@@ -578,6 +580,25 @@ class IfElseBlock(ProjectVisitor):
         result = LogicVisitor().visitLogicExpr(ctx)
         # print("Result:\t" + str(result))
         return result
+
+    # no idea what this is
+    # def visitWhileStatement(self, ctx: ProjectParser.IfStatementContext):
+    #     ctxLogic = ctx.logicExpr()
+    #     ctxCode = ctx.ifElseCode()
+
+    #     result = None
+    #     logVal = self.visitLogicExpr(ctxLogic)
+
+    #     if(logVal != None):
+    #         if(str(logVal) == "True"):
+    #             logVal = True
+    #         elif(str(logVal) == "False"):
+    #             logVal = False
+
+    #     while(logVal):
+    #         result = self.visitWhileLoop(ctxCode)
+
+    #     return logVal
     
 class LogicVisitor(ProjectVisitor):
 
@@ -719,6 +740,7 @@ class ForLoop(ProjectVisitor):
                 return result
 
             c = node.getChild(i)
+            debug_var = c.getText()
             result = c.accept(self)
 
             # need to get id and store as var
@@ -737,20 +759,61 @@ class ForLoop(ProjectVisitor):
     
     def visitRangeChildren(self, node):
         result = None
+        min_value = None
+        max_value = None
+        increment_value = None
+        result_arr = []
         n = node.getChildCount()
         for i in range(n):
             if not self.shouldVisitNextChild(node, result):
                 return result
 
             c = node.getChild(i)
-            # if c is logicVal, visit LogicExpr.visitLogicVal()
-            #result = c.accept(self)
+            debug_var = c.getText()
+            result = c.accept(self)
+
+            if isValidInt(str(result)):
+                if min_value == None:
+                    min_value = int(str(result))
+                elif max_value == None:
+                    max_value = int(str(result))
+                else:
+                    increment_value = int(str(result))
+
+            if i == (n - 1):
+                if max_value == None:
+                    max_value = min_value
+                    min_value = 0
+                if increment_value == None:
+                    increment_value = 1
+                
+                for x in range(min_value, max_value, increment_value):
+                    result_arr.append(x)
+
 
             if(result != None):
                 # result should be logicVal
                 # VAR, ATOM, or equation
-                return result
-        
+                pass
+
+        return result_arr
+
+    def visitRangeVal(self, ctx:ProjectParser.RangeValContext):
+        result = None
+        if(ctx.VAR()):
+            result = varDict.get(str(ctx.VAR()))
+            if(result == None):
+                raise NameError("name '" + str(ctx.VAR()) + "' is not defined")
+            if(result != None):
+                result = result.get("Value")
+        elif(ctx.ATOM()):
+            result = ctx.ATOM()
+        elif(ctx.equation() != None):
+            result = EquationVisitor().visitEquation(ctx.equation())
+
+        # print("LogVal:\t" + ctx.getText() + " = " + str(result))
+        # print("LogVal:\t" + ctx.getText())
+
         return result
     
     # should look identical to ifElseCode
@@ -791,7 +854,28 @@ class WhileLoop(ProjectVisitor):
         # do whileCode with whileloop using those previous values and id
         return result
 
-    def whileLooping(self, ctx: ProjectParser.WhileLoopingContext):
+    """def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
+        logVal = True
+        # logVal = whileLooping()
+
+        if(logVal):
+           # visitWhileStatement()
+           pass
+
+        return logVal"""
+
+    def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor().visit(c)
+        
+        return result
+
+    """def whileLooping(self, ctx: ProjectParser.WhileLoopingContext):
         ctxLogic = ctx.logicExpr()
         ctxCode = ctx.ifElseCode()
 
@@ -807,27 +891,7 @@ class WhileLoop(ProjectVisitor):
         if(logVal):
             result = self.visitWhileCode(ctxCode)
 
-        return logVal
-
-    def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
-        logVal = True
-        logVal = whileLooping(ctx)
-
-        if(logVal):
-           visitWhileStatement()
-
-        return logVal
-
-    def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
-        n = ctx.getChildCount()
-        result = None
-
-        for i in range(n):
-            c = ctx.getChild(i)
-
-            result = GrammarVisitor().visit(c)
-        
-        return result
+        return logVal"""
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         # print("LogExpr:\t" + ctx.getText())
@@ -853,11 +917,11 @@ def isValidFloat(string):
 
 # check for True or False
 # !Something is wrong with this so don't use
-# def isValidBool(string):
-#     if str(string) == "True" or str(string) == "False":
-#         return True
-#     else:
-#         return False
+def isValidBool(string):
+    if str(string) == "True" or str(string) == "False":
+        return True
+    else:
+        return False
 
 # check for quotes at front and back
 def isValidString(string):

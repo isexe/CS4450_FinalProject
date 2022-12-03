@@ -14,12 +14,13 @@ code : (block | line)* EOF ;
 // blocks of code
 block 
     : ifElseBlock
-    | whileloop
+    | whileLoop
     | forLoop
     ;
 
 // each line of code
-line : statement EOL ;
+line : statement EOL
+    | EOL ;
 
 // all the parse rules that need to be followed
 // be careful, currently equation can go straight to atom and overshadow stuff
@@ -67,7 +68,7 @@ IF: 'if' ;
 ELIF: 'elif' ;
 ELSE: 'else' ;
 
-whileloop
+whileLoop
     : ((WHILE logicExpr (':')) EOL
     | (WHILE ('(')logicExpr('):')) EOL)
         whileCode
@@ -88,7 +89,13 @@ forLoop
 // can have up to three params
 // could change to just equation, but logicVal allows for shorter parse tree
 range
-    :  logicVal (',' logicVal (',' logicVal)?)?
+    :  rangeVal (',' rangeVal (',' rangeVal)?)?
+    ;
+
+rangeVal
+    : VAR
+    | ATOM 
+    | equation
     ;
 
 // forLoop
@@ -247,3 +254,5 @@ EOL : [\n\r]+ ;
 TAB : [\t];
 
 WS : [ ]+ -> skip ;
+
+COMMENTS : '#' (NUM | [A-Za-z,.<>/?'";:!@#$%^&*()\-_] | WS | TAB)* -> skip ;
