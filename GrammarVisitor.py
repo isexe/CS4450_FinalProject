@@ -570,6 +570,24 @@ class IfElseBlock(ProjectVisitor):
         result = LogicVisitor().visitLogicExpr(ctx)
         # print("Result:\t" + str(result))
         return result
+
+    def visitWhileStatement(self, ctx: ProjectParser.IfStatementContext):
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.ifElseCode()
+
+        result = None
+        logVal = self.visitLogicExpr(ctxLogic)
+
+        if(logVal != None):
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
+
+        while(logVal):
+            result = self.visitWhileLoop(ctxCode)
+
+        return logVal
     
 class LogicVisitor(ProjectVisitor):
 
