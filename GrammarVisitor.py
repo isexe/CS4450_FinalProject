@@ -66,7 +66,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
-        result = IfElseBlock().visitIfElseBlock(ctx)
+        result = IfElseVisitor().visitIfElseBlock(ctx)
 
         if(self.debugging):
             # try to print which statement it would execute, but returns last statement even if none were executed
@@ -81,7 +81,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitForLoop(self, ctx: ProjectParser.ForLoopContext):
-        result = ForLoop().visitForLoop(ctx)
+        result = ForLoopVisitor().visitForLoop(ctx)
 
         if(self.debugging):
             print("For loop running")
@@ -483,7 +483,7 @@ class EquationVisitor(ProjectVisitor):
     def visitSqrt(self, ctx: ProjectParser.SqrtContext):
         return ctx.getText()
 
-class IfElseBlock(ProjectVisitor):
+class IfElseVisitor(ProjectVisitor):
     # This ctx is the parent of all the ifelseblock code, has statement and code sections
     # need to visit children
     # start with if then go through each block
@@ -726,34 +726,58 @@ class LogicVisitor(ProjectVisitor):
         result = ctx.getText()
         return result
 
-class ForLoop(ProjectVisitor):
+class ForLoopVisitor(ProjectVisitor):
 
     def visitForLoop(self, ctx:ProjectParser.ForLoopContext):
-        result = self.visitForLoopChildren(ctx)
+        result = None
+
+        ctx_id = ctx.id_()
+        ctx_range = ctx.range_()
+
+        result_id = self.visitId(ctx_id)
+        result_range = self.visitRange(ctx_range)
+
+        print(result_id)
+        print(result_range)
+
+        # get id val
+
+
+        if(len(result_range) == 1):
+            stop = result_range[0]
+            
+            # do forLoop with stop
+            for i in range(stop):
+                self.visitForCode(ctx.forCode())
+
+        elif(len(result_range) == 2):
+            start = result_range[0]
+            stop = result_range[1]
+
+            # do forLoop with start, stop
+            for i in range(start, stop):
+                self.visitForCode(ctx.forCode())
+
+        else:
+            start = result_range[0]
+            stop = result_range[1]
+            step = result_range[2]
+
+            # do forLoop with start, stop, step
+            for i in range(start, stop, step):
+                self.visitForCode(ctx.forCode())
+
+
         return result
 
-    def visitForLoopChildren(self, node):
-        result = None
-        var_name = None
-        result_arr = []
-        n = node.getChildCount()
-        for i in range(n):
-            if not self.shouldVisitNextChild(node, result):
-                return result
+    def visitId(self, ctx: ProjectParser.IdContext):
+        result = ctx.VAR()
 
-            c = node.getChild(i)
-            result = c.accept(self)
+        # look for var and return reference
 
-            if(i == 1):
-                var_name = c.getText()
+        # if not found create var and return reference
 
-            # need to get id and store as var
-
-            if(result != None):
-                result_arr = result
-
-        val = { "Address" :id(result_arr[0]), "Value" : result_arr[0], "Type" : type(result_arr[0]), "Lifetime" : "", "Scope" : ""}
-        varDict[var_name] = val
+        return result
 
     def visitRange(self, ctx:ProjectParser.RangeContext):
         result = self.visitRangeChildren(ctx)
@@ -761,41 +785,34 @@ class ForLoop(ProjectVisitor):
     
     def visitRangeChildren(self, node):
         result = None
-        min_value = None
-        max_value = None
-        increment_value = None
-        result_arr = []
         n = node.getChildCount()
         for i in range(n):
             if not self.shouldVisitNextChild(node, result):
                 return result
 
             c = node.getChild(i)
-            result = c.accept(self)
+            child_result = c.accept(self)
 
-            if isValidInt(str(result)):
-                if min_value == None:
-                    min_value = int(str(result))
-                elif max_value == None:
-                    max_value = int(str(result))
+            if(child_result != None):
+                child_result = str(child_result)
+
+                # format the result
+                if(isValidInt(child_result)):
+                    child_result = int(child_result)
+                elif(isValidFloat(child_result)):
+                    child_result = float(child_result)
+                elif(isValidBool(child_result)):
+                    if(child_result == "True"):
+                        child_result = True
+                    else:
+                        child_result = False
+
+                if(result == None):
+                    result = [child_result]
                 else:
-                    increment_value = int(str(result))
+                    result.append(child_result)
 
-            if(result != None):
-                # result should be logicVal
-                # VAR, ATOM, or equation
-                pass
-
-        if max_value == None:
-            max_value = min_value
-            min_value = 0
-            if increment_value == None:
-                increment_value = 1
-                
-            for x in range(min_value, max_value, increment_value):
-                result_arr.append(x)
-
-        return result_arr
+        return result
 
     def visitRangeVal(self, ctx:ProjectParser.RangeValContext):
         result = None
@@ -810,9 +827,6 @@ class ForLoop(ProjectVisitor):
         elif(ctx.equation() != None):
             result = EquationVisitor().visitEquation(ctx.equation())
 
-        # print("LogVal:\t" + ctx.getText() + " = " + str(result))
-        # print("LogVal:\t" + ctx.getText())
-
         return result
     
     # should look identical to ifElseCode
@@ -826,7 +840,7 @@ class ForLoop(ProjectVisitor):
             result = GrammarVisitor().visit(c)
         return result
             
-class WhileLoop(ProjectVisitor):
+class WhileLoopVisitor(ProjectVisitor):
 
     def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
         print("While loop called")
