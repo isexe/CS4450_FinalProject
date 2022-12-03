@@ -833,36 +833,25 @@ class WhileLoop(ProjectVisitor):
         result = self.visitWhileLoopChildren(ctx)
         return result
 
-    def visitWhileLoopChildren(self, node):
-        result = None
-        n = node.getChildCount()
-        for i in range(n):
-            if not self.shouldVisitNextChild(node, result):
-                return result
+    def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.ifElseCode()
 
-            c = node.getChild(i)
-            result = c.accept(self)
+        result = True
+        logVal = self.visitLogicExpr(ctxLogic)
 
-            # need to get id and store as var
-            # need to get range values and store in array
-
-            if(result != None):
-                pass
-
-        # set start, end, and step values according to size of array
-
-        # do whileCode with whileloop using those previous values and id
-        return result
-
-    """def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
-        logVal = True
-        # logVal = whileLooping()
+        if(logVal != None):
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
 
         if(logVal):
-           # visitWhileStatement()
-           pass
+            while(logVal):
+                result = self.visitWhileCode(ctxCode)
+                logVal = self.visitLogicExpr(ctxLogic)
 
-        return logVal"""
+        return logVal
 
     def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
         n = ctx.getChildCount()
@@ -874,24 +863,6 @@ class WhileLoop(ProjectVisitor):
             result = GrammarVisitor().visit(c)
         
         return result
-
-    """def whileLooping(self, ctx: ProjectParser.WhileLoopingContext):
-        ctxLogic = ctx.logicExpr()
-        ctxCode = ctx.ifElseCode()
-
-        result = None
-        logVal = self.visitLogicExpr(ctxLogic)
-
-        if(logVal != None):
-            if(str(logVal) == "True"):
-                logVal = True
-            elif(str(logVal) == "False"):
-                logVal = False
-
-        if(logVal):
-            result = self.visitWhileCode(ctxCode)
-
-        return logVal"""
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         # print("LogExpr:\t" + ctx.getText())
