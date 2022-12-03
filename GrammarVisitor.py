@@ -820,6 +820,15 @@ class WhileLoop(ProjectVisitor):
         
         return result
 
+    def whileLooping(self, ctx: ProjectParser.WhileLoopingContext):
+        logVal = True
+        logVal = visitWhileStatement()
+
+        if(logVal):
+            whileLoop()
+
+        return logVal
+
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         # print("LogExpr:\t" + ctx.getText())
         result = LogicVisitor().visitLogicExpr(ctx)
