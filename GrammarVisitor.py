@@ -734,24 +734,26 @@ class ForLoop(ProjectVisitor):
 
     def visitForLoopChildren(self, node):
         result = None
+        var_name = None
+        result_arr = []
         n = node.getChildCount()
         for i in range(n):
             if not self.shouldVisitNextChild(node, result):
                 return result
 
             c = node.getChild(i)
-            debug_var = c.getText()
             result = c.accept(self)
 
+            if(i == 1):
+                var_name = c.getText()
+
             # need to get id and store as var
-            # need to get range values and store in array
 
             if(result != None):
-                pass
+                result_arr = result
 
-        # set start, end, and step values according to size of array
-
-        # do forCode with forloop using those previous values and id
+        val = { "Address" :id(result_arr[0]), "Value" : result_arr[0], "Type" : type(result_arr[0]), "Lifetime" : "", "Scope" : ""}
+        varDict[var_name] = val
 
     def visitRange(self, ctx:ProjectParser.RangeContext):
         result = self.visitRangeChildren(ctx)
@@ -769,7 +771,6 @@ class ForLoop(ProjectVisitor):
                 return result
 
             c = node.getChild(i)
-            debug_var = c.getText()
             result = c.accept(self)
 
             if isValidInt(str(result)):
@@ -780,21 +781,19 @@ class ForLoop(ProjectVisitor):
                 else:
                     increment_value = int(str(result))
 
-            if i == (n - 1):
-                if max_value == None:
-                    max_value = min_value
-                    min_value = 0
-                if increment_value == None:
-                    increment_value = 1
-                
-                for x in range(min_value, max_value, increment_value):
-                    result_arr.append(x)
-
-
             if(result != None):
                 # result should be logicVal
                 # VAR, ATOM, or equation
                 pass
+
+        if max_value == None:
+            max_value = min_value
+            min_value = 0
+            if increment_value == None:
+                increment_value = 1
+                
+            for x in range(min_value, max_value, increment_value):
+                result_arr.append(x)
 
         return result_arr
 
