@@ -19,7 +19,8 @@ block
     ;
 
 // each line of code
-line : statement EOL ;
+line : statement EOL
+    | EOL ;
 
 // all the parse rules that need to be followed
 // be careful, currently equation can go straight to atom and overshadow stuff
@@ -247,3 +248,5 @@ EOL : [\n\r]+ ;
 TAB : [\t];
 
 WS : [ ]+ -> skip ;
+
+COMMENTS : '#' (NUM | [A-Za-z,.<>/?'";:!@#$%^&*()\-_] | WS | TAB)* -> skip ;
