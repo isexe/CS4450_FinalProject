@@ -749,6 +749,9 @@ class ForLoop(ProjectVisitor):
             if(result != None):
                 # result should be logicVal
                 # VAR, ATOM, or equation
+                return result
+        
+        return result
     
     # should look identical to ifElseCode
     def visitForCode(self, ctx:ProjectParser.ForCodeContext):
@@ -762,6 +765,7 @@ class ForLoop(ProjectVisitor):
         return result
             
 class WhileLoop(ProjectVisitor):
+
     def visitWhileLoop(self, ctx:ProjectParser.WhileLoopContext):
         result = self.visitWhileLoopChildren(ctx)
         return result
@@ -785,7 +789,42 @@ class WhileLoop(ProjectVisitor):
         # set start, end, and step values according to size of array
 
         # do whileCode with whileloop using those previous values and id
+        return result
 
+    def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.ifElseCode()
+
+        result = None
+        logVal = self.visitLogicExpr(ctxLogic)
+
+        if(logVal != None):
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
+
+        if(logVal):
+            result = self.visitWhileCode(ctxCode)
+
+        return logVal
+
+    def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor().visit(c)
+        
+        return result
+
+    def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
+        # print("LogExpr:\t" + ctx.getText())
+        result = LogicVisitor().visitLogicExpr(ctx)
+        # print("Result:\t" + str(result))
+        return result
 
 # try converting it to int, if fail not int
 def isValidInt(string):
