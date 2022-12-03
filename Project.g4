@@ -4,9 +4,8 @@ grammar Project;
 // as you need to use these remove them from list and insert them in the section you used them
 // i.e. if section now has lexer rule for IF and ELSE
 RESERVED_WORD 
-    : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' 
-    | 'while' | 'return' | 'null' | 'this' 
-    | 'new' | 'String' | 'str' | 'int' | 'float' | 'complex'| 'list' | 'tuple' | 'range'
+    : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' | 'return' | 'null' | 'this' 
+    | 'new' | 'String' | 'str' | 'int' | 'float' | 'complex'| 'list' | 'tuple'
     | 'dict' | 'set' | 'frozenset' | 'bool' | 'bytes' | 'bytearray' | 'memoryview' | 'nonetype';
 
 // compile all the code
@@ -63,11 +62,21 @@ ifElseCode
 whileloop
     : ((WHILE logicExpr (':')) EOL
     | (WHILE ('(')logicExpr('):')) EOL)
-        whileCode
+        loopCode
     ;
 
-whileCode
+loopCode
     : (TAB line)+
+    ;
+
+range
+    : (RANGE '(' (VAR) (',' VAR)? (',' VAR)?)
+    ;
+
+forLoop
+    : ((FOR VAR IN RANGE (':')) EOL
+    | (FOR ('(') VAR IN RANGE (')')) EOL)
+        loopCode
     ;
 
 IF: 'if' ;
@@ -75,6 +84,9 @@ ELIF: 'elif' ;
 ELSE: 'else' ;
 
 WHILE: 'while';
+FOR: 'for';
+IN: 'in';
+RANGE: 'range';
 
 logicExpr 
     : '('? (NOT)? (logicVal (logicOp logicVal)*) ')'? (logicConj '('? logicExpr ')'?)*
