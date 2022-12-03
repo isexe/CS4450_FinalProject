@@ -729,29 +729,42 @@ class LogicVisitor(ProjectVisitor):
 class ForLoop(ProjectVisitor):
 
     def visitForLoop(self, ctx:ProjectParser.ForLoopContext):
-        result = self.visitForLoopChildren(ctx)
+        result = None
+
+        ctx_id = ctx.id_()
+        ctx_range = ctx.range_()
+
+        result_id = self.visitId(ctx_id)
+        result_range = self.visitRange(ctx_range)
+
+        print(result_id)
+        print(result_range)
+
+        # get id val
+
+        if(result_range.count == 1):
+            # do forLoop with stop
+            # update id val when loop starts
+            pass
+        elif(result_range.count == 2):
+            # do forLoop with start, stop
+            # update id val when loop starts
+            pass
+        else:
+            # do forLoop with start, stop, step
+            # update id val when loop starts
+            pass
+
         return result
 
-    def visitForLoopChildren(self, node):
-        result = None
-        n = node.getChildCount()
-        for i in range(n):
-            if not self.shouldVisitNextChild(node, result):
-                return result
+    def visitId(self, ctx: ProjectParser.IdContext):
+        result = ctx.VAR()
 
-            c = node.getChild(i)
-            debug_var = c.getText()
-            result = c.accept(self)
+        # look for var and return reference
 
-            # need to get id and store as var
-            # need to get range values and store in array
+        # if not found create var and return reference
 
-            if(result != None):
-                pass
-
-        # set start, end, and step values according to size of array
-
-        # do forCode with forloop using those previous values and id
+        return result
 
     def visitRange(self, ctx:ProjectParser.RangeContext):
         result = self.visitRangeChildren(ctx)
@@ -759,23 +772,32 @@ class ForLoop(ProjectVisitor):
     
     def visitRangeChildren(self, node):
         result = None
-        min_value = None
-        max_value = None
-        increment_value = None
         n = node.getChildCount()
         for i in range(n):
             if not self.shouldVisitNextChild(node, result):
                 return result
 
             c = node.getChild(i)
-            debug_var = c.getText()
-            result = c.accept(self)
-            print(str(result))
+            child_result = c.accept(self)
 
-            if(result != None):
-                # result should be logicVal
-                # VAR, ATOM, or equation
-                pass
+            if(child_result != None):
+                child_result = str(child_result)
+
+                # format the result
+                if(isValidInt(child_result)):
+                    child_result = int(child_result)
+                elif(isValidFloat(child_result)):
+                    child_result = float(child_result)
+                elif(isValidBool(child_result)):
+                    if(child_result == "True"):
+                        child_result = True
+                    else:
+                        child_result = False
+
+                if(result == None):
+                    result = [child_result]
+                else:
+                    result.append(child_result)
 
         return result
 
@@ -791,9 +813,6 @@ class ForLoop(ProjectVisitor):
             result = ctx.ATOM()
         elif(ctx.equation() != None):
             result = EquationVisitor().visitEquation(ctx.equation())
-
-        # print("LogVal:\t" + ctx.getText() + " = " + str(result))
-        # print("LogVal:\t" + ctx.getText())
 
         return result
     
