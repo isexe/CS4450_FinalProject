@@ -737,17 +737,20 @@ class ForLoopVisitor(ProjectVisitor):
         result_id = self.visitId(ctx_id)
         result_range = self.visitRange(ctx_range)
 
-        print(result_id)
-        print(result_range)
-
-        # get id val
-
-
         if(len(result_range) == 1):
             stop = result_range[0]
             
             # do forLoop with stop
             for i in range(stop):
+                # update var value
+                # if no var exists, create new var with result_id
+                var = varDict.get(result_id)
+                if(var == None):
+                    var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                else:
+                    var["Value"] = i
+                    var["Type"] = type(i)
+
                 self.visitForCode(ctx.forCode())
 
         elif(len(result_range) == 2):
@@ -756,6 +759,17 @@ class ForLoopVisitor(ProjectVisitor):
 
             # do forLoop with start, stop
             for i in range(start, stop):
+                # update var value
+                # if no var exists, create new var with result_id
+                # update var value
+                # if no var exists, create new var with result_id
+                var = varDict.get(result_id)
+                if(var == None):
+                    var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                else:
+                    var["Value"] = i
+                    var["Type"] = type(i)
+
                 self.visitForCode(ctx.forCode())
 
         else:
@@ -765,19 +779,24 @@ class ForLoopVisitor(ProjectVisitor):
 
             # do forLoop with start, stop, step
             for i in range(start, stop, step):
+                # update var value
+                # if no var exists, create new var with result_id
+                # update var value
+                # if no var exists, create new var with result_id
+                var = varDict.get(result_id)
+                if(var == None):
+                    var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                else:
+                    var["Value"] = i
+                    var["Type"] = type(i)
+
                 self.visitForCode(ctx.forCode())
 
 
         return result
 
     def visitId(self, ctx: ProjectParser.IdContext):
-        result = ctx.VAR()
-
-        # look for var and return reference
-
-        # if not found create var and return reference
-
-        return result
+        return str(ctx.VAR())
 
     def visitRange(self, ctx:ProjectParser.RangeContext):
         result = self.visitRangeChildren(ctx)
