@@ -84,6 +84,7 @@ class GrammarVisitor(ProjectVisitor):
         result = ForLoop().visitForLoop(ctx)
 
         if(self.debugging):
+            print("For loop running")
             # print some debugging statement
             pass
 
@@ -739,6 +740,7 @@ class ForLoop(ProjectVisitor):
                 return result
 
             c = node.getChild(i)
+            debug_var = c.getText()
             result = c.accept(self)
 
             # need to get id and store as var
@@ -757,14 +759,18 @@ class ForLoop(ProjectVisitor):
     
     def visitRangeChildren(self, node):
         result = None
+        min_value = None
+        max_value = None
+        increment_value = None
         n = node.getChildCount()
         for i in range(n):
             if not self.shouldVisitNextChild(node, result):
                 return result
 
             c = node.getChild(i)
-            # if c is logicVal, visit LogicExpr.visitLogicVal()
-            #result = c.accept(self)
+            debug_var = c.getText()
+            result = c.accept(self)
+            print(str(result))
 
             if(result != None):
                 # result should be logicVal
@@ -811,7 +817,7 @@ class WhileLoop(ProjectVisitor):
         # do whileCode with whileloop using those previous values and id
         return result
 
-    def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
+    """def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
         logVal = True
         # logVal = whileLooping()
 
@@ -819,7 +825,7 @@ class WhileLoop(ProjectVisitor):
            # visitWhileStatement()
            pass
 
-        return logVal
+        return logVal"""
 
     def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
         n = ctx.getChildCount()
@@ -832,7 +838,7 @@ class WhileLoop(ProjectVisitor):
         
         return result
 
-    def whileLooping(self, ctx: ProjectParser.WhileLoopingContext):
+    """def whileLooping(self, ctx: ProjectParser.WhileLoopingContext):
         ctxLogic = ctx.logicExpr()
         ctxCode = ctx.ifElseCode()
 
@@ -848,7 +854,7 @@ class WhileLoop(ProjectVisitor):
         if(logVal):
             result = self.visitWhileCode(ctxCode)
 
-        return logVal
+        return logVal"""
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         # print("LogExpr:\t" + ctx.getText())

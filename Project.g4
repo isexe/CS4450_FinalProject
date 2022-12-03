@@ -14,7 +14,7 @@ code : (block | line)* EOF ;
 // blocks of code
 block 
     : ifElseBlock
-    | whileloop
+    | whileLoop
     | forLoop
     ;
 
@@ -67,7 +67,7 @@ IF: 'if' ;
 ELIF: 'elif' ;
 ELSE: 'else' ;
 
-whileloop
+whileLoop
     : ((WHILE logicExpr (':')) EOL
     | (WHILE ('(')logicExpr('):')) EOL)
         whileCode
