@@ -791,26 +791,6 @@ class WhileLoop(ProjectVisitor):
         # do whileCode with whileloop using those previous values and id
         return result
 
-    def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
-        logVal = True
-        logVal = whileLooping()
-
-        if(logVal):
-           visitWhileStatement()
-
-        return logVal
-
-    def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
-        n = ctx.getChildCount()
-        result = None
-
-        for i in range(n):
-            c = ctx.getChild(i)
-
-            result = GrammarVisitor().visit(c)
-        
-        return result
-
     def whileLooping(self, ctx: ProjectParser.WhileLoopingContext):
         ctxLogic = ctx.logicExpr()
         ctxCode = ctx.ifElseCode()
@@ -828,6 +808,26 @@ class WhileLoop(ProjectVisitor):
             result = self.visitWhileCode(ctxCode)
 
         return logVal
+
+    def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
+        logVal = True
+        logVal = whileLooping(ctx)
+
+        if(logVal):
+           visitWhileStatement()
+
+        return logVal
+
+    def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor().visit(c)
+        
+        return result
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         # print("LogExpr:\t" + ctx.getText())
