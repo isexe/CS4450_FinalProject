@@ -85,6 +85,7 @@ class GrammarVisitor(ProjectVisitor):
 
         if(self.debugging):
             # print some debugging statement
+            pass
 
         return result
 
@@ -749,6 +750,7 @@ class ForLoop(ProjectVisitor):
             if(result != None):
                 # result should be logicVal
                 # VAR, ATOM, or equation
+                pass
     
     # should look identical to ifElseCode
     def visitForCode(self, ctx:ProjectParser.ForCodeContext):
