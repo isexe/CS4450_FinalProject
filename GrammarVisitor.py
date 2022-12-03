@@ -66,7 +66,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
-        result = IfElseBlock().visitIfElseBlock(ctx)
+        result = IfElseVisitor().visitIfElseBlock(ctx)
 
         if(self.debugging):
             # try to print which statement it would execute, but returns last statement even if none were executed
@@ -81,7 +81,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitForLoop(self, ctx: ProjectParser.ForLoopContext):
-        result = ForLoop().visitForLoop(ctx)
+        result = ForLoopVisitor().visitForLoop(ctx)
 
         if(self.debugging):
             print("For loop running")
@@ -483,7 +483,7 @@ class EquationVisitor(ProjectVisitor):
     def visitSqrt(self, ctx: ProjectParser.SqrtContext):
         return ctx.getText()
 
-class IfElseBlock(ProjectVisitor):
+class IfElseVisitor(ProjectVisitor):
     # This ctx is the parent of all the ifelseblock code, has statement and code sections
     # need to visit children
     # start with if then go through each block
@@ -726,7 +726,7 @@ class LogicVisitor(ProjectVisitor):
         result = ctx.getText()
         return result
 
-class ForLoop(ProjectVisitor):
+class ForLoopVisitor(ProjectVisitor):
 
     def visitForLoop(self, ctx:ProjectParser.ForLoopContext):
         result = None
@@ -742,18 +742,31 @@ class ForLoop(ProjectVisitor):
 
         # get id val
 
-        if(result_range.count == 1):
+
+        if(len(result_range) == 1):
+            stop = result_range[0]
+            
             # do forLoop with stop
-            # update id val when loop starts
-            pass
-        elif(result_range.count == 2):
+            for i in range(stop):
+                self.visitForCode(ctx.forCode())
+
+        elif(len(result_range) == 2):
+            start = result_range[0]
+            stop = result_range[1]
+
             # do forLoop with start, stop
-            # update id val when loop starts
-            pass
+            for i in range(start, stop):
+                self.visitForCode(ctx.forCode())
+
         else:
+            start = result_range[0]
+            stop = result_range[1]
+            step = result_range[2]
+
             # do forLoop with start, stop, step
-            # update id val when loop starts
-            pass
+            for i in range(start, stop, step):
+                self.visitForCode(ctx.forCode())
+
 
         return result
 
@@ -827,7 +840,7 @@ class ForLoop(ProjectVisitor):
             result = GrammarVisitor().visit(c)
         return result
             
-class WhileLoop(ProjectVisitor):
+class WhileLoopVisitor(ProjectVisitor):
 
     def visitWhileLoop(self, ctx:ProjectParser.WhileLoopContext):
         result = self.visitWhileLoopChildren(ctx)
