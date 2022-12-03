@@ -833,6 +833,7 @@ class WhileLoop(ProjectVisitor):
         result = self.visitWhileLoopChildren(ctx)
         return result
 
+    """
     def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
         ctxLogic = ctx.logicExpr()
         ctxCode = ctx.ifElseCode()
@@ -852,6 +853,7 @@ class WhileLoop(ProjectVisitor):
                 logVal = self.visitLogicExpr(ctxLogic)
 
         return logVal
+    """
 
     def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
         n = ctx.getChildCount()
