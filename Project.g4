@@ -12,7 +12,11 @@ RESERVED_WORD
 code : (block | line)* EOF ;
 
 // blocks of code
-block : ifElseBlock;
+block 
+    : ifElseBlock
+    | whileloop
+    | forLoop
+    ;
 
 // each line of code
 line : statement EOL ;
@@ -58,6 +62,10 @@ elseStatement
 ifElseCode
     : (TAB line)+
     ;
+    
+IF: 'if' ;
+ELIF: 'elif' ;
+ELSE: 'else' ;
 
 whileloop
     : ((WHILE logicExpr (':')) EOL
@@ -68,26 +76,25 @@ whileloop
 whileCode
     : (TAB line)+
     ;
+    
+WHILE: 'while';
 
+// this works, but is super ugly
 forLoop
-    : ((FOR id IN range (':')) EOL
-    | (FOR ('(') id IN range (')')) EOL)
+    : (FOR id IN RANGE '(' rangeParam '):') EOL
         forCode
     ;
 
-range
-    : (RANGE '(' (logicVal) (',' logicVal)? (',' logicVal)?)
+rangeParam
+    : stop=equation
+    | start=equation ',' stop=equation
+    | start=equation ',' stop=equation ',' step=equation
     ;
 
 forCode
     : (TAB line)+
     ;
 
-IF: 'if' ;
-ELIF: 'elif' ;
-ELSE: 'else' ;
-
-WHILE: 'while';
 FOR: 'for';
 IN: 'in';
 RANGE: 'range';
@@ -212,8 +219,6 @@ BOOL : 'True' | 'False' ;
 
 // None
 NONE : 'None' ;
-
-
 
 // TODO need to include much more than this
 STRING : QUOTES (CHAR | DIGIT | WS | TAB | EOL)+ QUOTES;
