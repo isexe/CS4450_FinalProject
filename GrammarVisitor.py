@@ -828,15 +828,12 @@ class ForLoop(ProjectVisitor):
             
 class WhileLoop(ProjectVisitor):
 
-    def visitWhileLoop(self, ctx:ProjectParser.WhileLoopContext):
-        result = self.visitWhileLoopChildren(ctx)
-        return result
-
-    def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
+    def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
+        print("While loop called")
         ctxLogic = ctx.logicExpr()
-        ctxCode = ctx.ifElseCode()
+        ctxCode = ctx.whileCode()
 
-        result = True
+        result = None
         logVal = self.visitLogicExpr(ctxLogic)
 
         if(logVal != None):
@@ -845,12 +842,13 @@ class WhileLoop(ProjectVisitor):
             elif(str(logVal) == "False"):
                 logVal = False
 
+        print("Logic Value"+logVal)
         if(logVal):
             while(logVal):
                 result = self.visitWhileCode(ctxCode)
                 logVal = self.visitLogicExpr(ctxLogic)
 
-        return logVal
+        return result
 
     def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
         n = ctx.getChildCount()
