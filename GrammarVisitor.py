@@ -833,26 +833,25 @@ class WhileLoop(ProjectVisitor):
         result = self.visitWhileLoopChildren(ctx)
         return result
 
-    def visitWhileLoopChildren(self, node):
-        result = None
-        n = node.getChildCount()
-        for i in range(n):
-            if not self.shouldVisitNextChild(node, result):
-                return result
+    def visitWhileStatement(self, ctx: ProjectParser.WhileStatementContext):
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.ifElseCode()
 
-            c = node.getChild(i)
-            result = c.accept(self)
+        result = True
+        logVal = self.visitLogicExpr(ctxLogic)
 
-            # need to get id and store as var
-            # need to get range values and store in array
+        if(logVal != None):
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
 
-            if(result != None):
-                pass
+        if(logVal):
+            while(logVal):
+                result = self.visitWhileCode(ctxCode)
+                logVal = self.visitLogicExpr(ctxLogic)
 
-        # set start, end, and step values according to size of array
-
-        # do whileCode with whileloop using those previous values and id
-        return result
+        return logVal
 
     def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
         n = ctx.getChildCount()
