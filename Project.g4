@@ -81,15 +81,25 @@ WHILE: 'while';
 
 // this works, but is super ugly
 forLoop
-    : (FOR id IN RANGE '(' rangeParam '):') EOL
+    : (FOR id IN RANGE ('(') range ('):')) EOL
         forCode
     ;
 
-rangeParam
-    : stop=equation
-    | start=equation ',' stop=equation
-    | start=equation ',' stop=equation ',' step=equation
+// can have up to three params
+range
+    :  logicVal (',' logicVal (',' logicVal)?)?
     ;
+
+// forLoop
+//     : (FOR id IN RANGE '(' rangeParam '):') EOL
+//         forCode
+//     ;
+
+// rangeParam
+//     : stop=equation
+//     | start=equation ',' stop=equation
+//     | start=equation ',' stop=equation ',' step=equation
+//     ;
 
 forCode
     : (TAB line)+
