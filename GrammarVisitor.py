@@ -873,7 +873,6 @@ class ForLoopVisitor(ProjectVisitor):
 class WhileLoopVisitor(ProjectVisitor):
 
     def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
-        print("While loop called")
         ctxLogic = ctx.logicExpr()
         ctxCode = ctx.whileCode()
 
@@ -886,15 +885,10 @@ class WhileLoopVisitor(ProjectVisitor):
             elif(str(logVal) == "False"):
                 logVal = False
 
-        print("Logic Value {}".format(logVal))
         if(logVal):
-            print("if passed")
             while(logVal):
-                print("while started")
                 result = self.visitWhileCode(ctxCode)
-                print("code scanned")
                 logVal = self.visitLogicExpr(ctxLogic)
-                print("Logic Value Again{}".format(logVal))
 
         return result
 
