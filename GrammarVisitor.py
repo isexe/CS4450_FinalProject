@@ -90,6 +90,16 @@ class GrammarVisitor(ProjectVisitor):
 
         return result
 
+    def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
+        result = WhileLoopVisitor().visitWhileLoop(ctx)
+
+        if(self.debugging):
+            print("While loop running")
+            # print some debugging statement
+            pass
+
+        return result
+
 class AssignVisitor(ProjectVisitor):
 
     # Visit a parse tree produced by ProjectParser#assign.
@@ -856,11 +866,15 @@ class WhileLoopVisitor(ProjectVisitor):
             elif(str(logVal) == "False"):
                 logVal = False
 
-        print("Logic Value"+logVal)
+        print("Logic Value {}".format(logVal))
         if(logVal):
+            print("if passed")
             while(logVal):
+                print("while started")
                 result = self.visitWhileCode(ctxCode)
+                print("code scanned")
                 logVal = self.visitLogicExpr(ctxLogic)
+                print("Logic Value Again{}".format(logVal))
 
         return result
 

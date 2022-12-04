@@ -70,7 +70,7 @@ ELSE: 'else' ;
 
 whileLoop
     : ((WHILE logicExpr (':')) EOL
-    | (WHILE ('(')logicExpr('):')) EOL)
+    | (WHILE ('(') logicExpr ('):')) EOL)
         whileCode
     ;
 
