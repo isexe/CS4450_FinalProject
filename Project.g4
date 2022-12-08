@@ -36,6 +36,24 @@ TODO need to allow for nested blocks
 to do this will need to figure out how to track indents
 */
 
+functionDefinition
+  : DEF functionID '(' (paramID (',' paramID)*)? '):' EOL
+      (TAB line)+  // again this needs to be reworked
+  ;
+
+// most likely need to add this to some larger type, maybe equation since that has most things rn
+functionCall
+  : functionID '(' (paramVal (',' paramVal)*)? ')'
+  ;
+
+functionID : VAR ; // might be something different, don't remember naming rules
+
+paramID : VAR ;
+// needs to be able to most other values and types
+paramVal : equation ;
+
+DEF : 'def' ;
+
 ifElseBlock :
     ifStatement
     (elifStatement)*
