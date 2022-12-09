@@ -40,7 +40,6 @@ class GrammarVisitor(ProjectVisitor):
 
     # Visit a parse tree produced by ProjectParser#block.
     def visitBlock(self, ctx: ProjectParser.BlockContext):
-        
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by ProjectParser#statement.
@@ -102,8 +101,27 @@ class GrammarVisitor(ProjectVisitor):
             pass
 
         return result
+    
+    def visitIndent(self, ctx: ProjectParser.IndentContext):
+        tabArr = ctx.TAB()
+        
+        count = countTabs(tabArr)
+        
+        print("TABS: " + str(count))
+        
+        # ensure no indent error
+        if(count > getIndent() + 1):
+            print("Indent Error")
+            pass
+        else:
+            print("New indent level")
+            setIndent(count)
+            
+            
+        
+        return super().visitIndent(ctx)
 
-class AssignVisitor(ProjectVisitor):
+class AssignVisitor(GrammarVisitor):
 
     # Visit a parse tree produced by ProjectParser#assign.
     def visitAssign(self, ctx: ProjectParser.AssignContext):
@@ -226,7 +244,7 @@ class AssignVisitor(ProjectVisitor):
 
         return val
 
-class EquationVisitor(ProjectVisitor):
+class EquationVisitor(GrammarVisitor):
 
     # Step 1: 
     # Visit a parse tree produced by ProjectParser#equation.
@@ -496,7 +514,7 @@ class EquationVisitor(ProjectVisitor):
     def visitSqrt(self, ctx: ProjectParser.SqrtContext):
         return ctx.getText()
 
-class IfElseVisitor(ProjectVisitor):
+class IfElseVisitor(GrammarVisitor):
     # This ctx is the parent of all the ifelseblock code, has statement and code sections
     # need to visit children
     # start with if then go through each block
@@ -593,27 +611,8 @@ class IfElseVisitor(ProjectVisitor):
         result = LogicVisitor().visitLogicExpr(ctx)
         # print("Result:\t" + str(result))
         return result
-
-    # no idea what this is
-    # def visitWhileStatement(self, ctx: ProjectParser.IfStatementContext):
-    #     ctxLogic = ctx.logicExpr()
-    #     ctxCode = ctx.ifElseCode()
-
-    #     result = None
-    #     logVal = self.visitLogicExpr(ctxLogic)
-
-    #     if(logVal != None):
-    #         if(str(logVal) == "True"):
-    #             logVal = True
-    #         elif(str(logVal) == "False"):
-    #             logVal = False
-
-    #     while(logVal):
-    #         result = self.visitWhileLoop(ctxCode)
-
-    #     return logVal
     
-class LogicVisitor(ProjectVisitor):
+class LogicVisitor(GrammarVisitor):
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         result = self.visitLogicExprChildren(ctx)
@@ -739,7 +738,7 @@ class LogicVisitor(ProjectVisitor):
         result = ctx.getText()
         return result
 
-class ForLoopVisitor(ProjectVisitor):
+class ForLoopVisitor(GrammarVisitor):
 
     def visitForLoop(self, ctx:ProjectParser.ForLoopContext):
         result = None
@@ -873,7 +872,7 @@ class ForLoopVisitor(ProjectVisitor):
             result = GrammarVisitor().visit(c)
         return result
             
-class WhileLoopVisitor(ProjectVisitor):
+class WhileLoopVisitor(GrammarVisitor):
 
     def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
         ctxLogic = ctx.logicExpr()
@@ -912,7 +911,7 @@ class WhileLoopVisitor(ProjectVisitor):
         # print("Result:\t" + str(result))
         return result
 
-class FunctionDefVisitor(ProjectVisitor):
+class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
         return 
 
@@ -922,7 +921,7 @@ class FunctionDefVisitor(ProjectVisitor):
     def visitParamVal(self, ctx: ProjectParser.ParamValContext):
         return
 
-class FunctionCallVisitor(ProjectVisitor):
+class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
         return
 
@@ -934,12 +933,14 @@ class FunctionCallVisitor(ProjectVisitor):
 
 # will count and return the num of tabs
 # if error returns -1
-def countTabs(string):
+def countTabs(tabs):
     count = 0
-    try:
-        string = str(string)
-        count = string.count("\t")    
-    except:
+    
+    if(type(tabs) is str):
+        count = tabs.count("\t")
+    elif(type(tabs) is list):
+        count = len(tabs)
+    else:
         count = -1
     
     return count
@@ -951,6 +952,14 @@ def indent():
 # dec indent level
 def dedent():
     indentLevel -= 1
+    
+# get indentLevel
+
+def getIndent():
+    return indentLevel
+
+def setIndent(val):
+    indentLevel = val
 
 # try converting it to int, if fail not int
 def isValidInt(string):
