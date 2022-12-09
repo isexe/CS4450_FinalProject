@@ -1035,6 +1035,9 @@ class FunctionCallVisitor(GrammarVisitor):
             result = GrammarVisitor(self.debugging).visit(c)
         
         return result
+
+    def visitParamVal(self, ctx: ProjectParser.ParamValContext):
+        
         
 # will count and return the num of tabs
 # if error returns -1
