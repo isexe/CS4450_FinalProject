@@ -32,9 +32,15 @@ to do this will need to figure out how to track indents
 
 functionDef
   : DEF functionID ( '(' paramID (',' paramID)* '):' | '():' ) EOL
-      ((TAB line)+
-      | TAB functionReturn EOL)
+        functionCode
   ;
+
+// can repeat code until a return
+functionCode
+    : functionReturn
+    | TAB line
+        functionCode
+    ;
 
 // most likely need to add this to some larger type, maybe equation since that has most things rn
 functionCall
@@ -42,7 +48,7 @@ functionCall
   ;
 
 functionReturn
-    : RETURN returnVal
+    : TAB RETURN returnVal EOL
     ;
 
 // TODO
