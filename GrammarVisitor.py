@@ -941,10 +941,20 @@ class WhileLoopVisitor(GrammarVisitor):
 class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
         ctx = ctx.functionID()
+
+        
         return
 
-    def visitparamIDChildren(self, node):
-        return
+    def visitFunctionCode(self, ctx: ProjectParser.FunctionCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor().visit(c)
+        
+        return result
 
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
