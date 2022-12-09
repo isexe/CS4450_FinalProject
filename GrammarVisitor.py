@@ -116,8 +116,6 @@ class GrammarVisitor(ProjectVisitor):
         else:
             print("New indent level")
             setIndent(count)
-            
-            
         
         return super().visitIndent(ctx)
 
