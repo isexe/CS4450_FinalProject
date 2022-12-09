@@ -58,7 +58,7 @@ class GrammarVisitor(ProjectVisitor):
     # Will direct to visit parse rule
     # i.e. 1 + 1 will go to visitEquation next
     def visitStatement(self, ctx:ProjectParser.StatementContext):
-        # need to catch return here
+        # need to catch functionReturn here and check if parent was functionDef
         
         return self.visitChildren(ctx)
 
@@ -979,25 +979,39 @@ class FunctionDefVisitor(GrammarVisitor):
 
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
-        ctx = ctx.functionID()
-        functionObj = sampleFunc.get(ctx.functionID())
+        functionId = str(ctx.functionID().VAR())
+        functionObj = varDict.get(functionId)
+        
+        paramVal = []
+        
+        for paramVal in ctx.paramVal():
+            val = self.visitParamVal(param)
+            paramVal.append(val)
+        
         if(functionObj == None):
             print(NameError)
             pass
 
-        ctxObjParams = functionObj.get("ParamArray")
-        ctxObj = functionObj.get("FunctionCode")
+        paramArray = functionObj.get("ParamArray")
+        functionCode = functionObj.get("FunctionCode")
         
-        if(ctxObj == None):
+        if(functionCode == None):
             print(NameError)
             pass
 
-        for i in ctxObjParams.keys():
-            if(i not in varDict):
-                val = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
-                varDict[str(i)] = val
+        for i in range(len(paramArray)):
+            if(i >= len(paramVal)):
+                # handle if too few parameters are passed in
+                pass
+            
+            paramId = paramArray[i]
+            val = paramVal[i]
+            
+            if(paramId not in varDict):
+                val = { "Address" :id(paramId), "Value" : paramVal, "Type" : type(paramVal), "Lifetime" : "", "Scope" : ""}
+                varDict[paramId] = val
 
-        result = self.visitFunctionCode(ctxObj)
+        result = self.visitFunctionCode(functionCode)
 
         return result
 
