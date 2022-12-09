@@ -24,21 +24,18 @@ statement
     | equation
     ;
 
-/* 
-TODO need to allow for nested blocks
-to do this will need to figure out how to track indents
-*/
-
-
+/***
+** FUNCTION STUFF
+***/
 functionDef :
     DEF functionID ( '(' paramID (',' paramID)* '):' | '():' ) EOL
-    functionCode
+        functionCode
   ;
 
 // can repeat code until a return
 functionCode
-    : functionReturn
-    | TAB line
+    : indent functionReturn EOL
+    | indent (block | line)
         functionCode
     ;
 
@@ -48,16 +45,9 @@ functionCall
   ;
 
 functionReturn
-    : TAB RETURN returnVal EOL
+    : RETURN returnVal
     ;
 
-// TODO
-// genericVal
-//     : VAR
-//     | ATOM
-//     | functionCall
-//     | equation 
-//     ;
 
 returnVal
     : VAR
@@ -68,7 +58,7 @@ returnVal
 
 RETURN : 'return' ;
 
-functionID : VAR ; // might be something different, don't remember naming rules
+functionID : VAR ;
 
 paramID : VAR ;
 paramVal 
@@ -79,10 +69,54 @@ paramVal
 
 DEF : 'def' ;
 
+/***
+** LOOP STUFF
+***/
+// while loop
+whileLoop
+    : ((WHILE logicExpr (':')) EOL
+    | (WHILE ('(') logicExpr ('):')) EOL)
+        whileCode
+    ;
+
+whileCode
+    : (indent (block | line))+
+    ;
+    
+WHILE: 'while';
+
+// for loop
+forLoop
+    : (FOR id IN RANGE ('(') range ('):')) EOL
+        forCode
+    ;
+    
+forCode
+    : (indent (block | line))+
+    ;
+
+range
+    :  rangeVal (',' rangeVal (',' rangeVal)?)?
+    ;
+
+rangeVal
+    : VAR
+    | ATOM 
+    | equation
+    ;
+
+FOR: 'for';
+IN: 'in';
+RANGE: 'range';
+
+/***
+** LOGICAL STUFF
+***/
+// if/else statment
 ifElseBlock :
     ifStatement
-    (elifStatement)*
-    (elseStatement)?
+    (indent* elifStatement)*
+    (indent* elseStatement)?
     ;
 
 
@@ -104,51 +138,14 @@ elseStatement
     ;
 
 ifElseCode
-    : (TAB line)+
+    : (indent (block | line))+
     ;
     
 IF: 'if' ;
 ELIF: 'elif' ;
 ELSE: 'else' ;
 
-whileLoop
-    : ((WHILE logicExpr (':')) EOL
-    | (WHILE ('(') logicExpr ('):')) EOL)
-        whileCode
-    ;
-
-whileCode
-    : (TAB line)+
-    ;
-    
-WHILE: 'while';
-
-// this works, but is super ugly
-forLoop
-    : (FOR id IN RANGE ('(') range ('):')) EOL
-        forCode
-    ;
-    
-forCode
-    : (TAB line)+
-    ;
-
-// can have up to three params
-// could change to just equation, but logicVal allows for shorter parse tree
-range
-    :  rangeVal (',' rangeVal (',' rangeVal)?)?
-    ;
-
-rangeVal
-    : VAR
-    | ATOM 
-    | equation
-    ;
-
-FOR: 'for';
-IN: 'in';
-RANGE: 'range';
-
+// logical Expression
 logicExpr 
     : '('? (NOT)? (logicVal (logicOp logicVal)*) ')'? (logicConj '('? logicExpr ')'?)*
     ;
@@ -177,6 +174,9 @@ AND : 'and' ;
 OR : 'or' ;
 NOT : 'not' ;
 
+/***
+** ASSIGN STUFF
+***/
 // parser rule for assignment
 // information on assignemnt operators found at resource #4
 assign
@@ -205,13 +205,15 @@ MIN_EQU : '-=' ;
 MULT_EQU : '*=' ;
 DIV_EQU : '/=' ;
 
+/***
+** ARITHMETIC STUFF
+***/
 //*** NOTES
 // Arithmetic rule
 // grows one way rather than both to fix ambiguity
 // changed lexer rules to parse rules
 // broke apart into seperate rules for neatness and more control
 // Depth First Search so important at bottom
-
 
 // parser rule for arithmetic
 equation : eqFourthOrder ;
@@ -245,6 +247,10 @@ mod : '%' ;
 add : '+' ;
 sub : '-' ;
 
+
+/***
+** GENERAL HOUSE KEEPING STUFF
+***/
 // rule for defining datatypes
 ATOM
     : NUM
@@ -283,8 +289,18 @@ VAR : [A-Za-z_][0-9A-Za-z_]* ;
 EOL : [\n\r]+ ;
 
 // not impemented yet but tabs are used for scope not WS
+indent : TAB+ ;
+
 TAB : [\t];
 
 WS : [ ]+ -> skip ;
 
 COMMENTS : '#' (NUM | [A-Za-z,.<>/?'";:!@#$%^&*()\-_] | WS | TAB)* -> skip ;
+
+// TODO
+// genericVal
+//     : VAR
+//     | ATOM
+//     | functionCall
+//     | equation 
+//     ;
