@@ -797,6 +797,7 @@ class ForLoopVisitor(GrammarVisitor):
                 var = varDict.get(result_id)
                 if(var == None):
                     var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[str(result_id)] = var
                 else:
                     var["Value"] = i
                     var["Type"] = type(i)
@@ -816,6 +817,7 @@ class ForLoopVisitor(GrammarVisitor):
                 var = varDict.get(result_id)
                 if(var == None):
                     var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[str(result_id)] = var
                 else:
                     var["Value"] = i
                     var["Type"] = type(i)
@@ -836,6 +838,7 @@ class ForLoopVisitor(GrammarVisitor):
                 var = varDict.get(result_id)
                 if(var == None):
                     var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[str(result_id)] = var
                 else:
                     var["Value"] = i
                     var["Type"] = type(i)
