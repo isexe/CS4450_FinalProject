@@ -101,6 +101,15 @@ class GrammarVisitor(ProjectVisitor):
             pass
 
         return result
+
+    def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
+        result = FunctionDefVisitor().visitFunctionDef(ctx)
+
+        if(self.debugging):
+            print("Function definition")
+            pass
+
+        return result
     
     # def visitIndent(self, ctx: ProjectParser.IndentContext):
     #     tabArr = ctx.TAB()

@@ -30,7 +30,7 @@ to do this will need to figure out how to track indents
 */
 
 functionDef
-  : DEF functionID '(' (paramID (',' paramID)*)? '):' EOL
+  : DEF functionID (('(' (paramID (',' paramID)*)? ')') | ('()')) ':' EOL
       ((TAB line)+
       | TAB functionReturn EOL)
   ;
