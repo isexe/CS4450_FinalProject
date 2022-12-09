@@ -18,6 +18,15 @@ sampleDict = {
 # should create a class for variables at some point
 varDict = {}
 
+
+# sample Function entry
+sampleFunc = {
+    "funcID" : "ctxObject"
+}
+# when calling fucntion do function lookup, if found call FunctionDefVisitor().visitFunctionCode(ctx object found in dict)
+
+functionDict = {}
+
 indentLevel = 0
 
 class UnexpectedError(Exception):
