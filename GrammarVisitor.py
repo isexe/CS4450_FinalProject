@@ -17,8 +17,6 @@ sampleDict = {
 # instead of having dict of dict,
 # should create a class for variables at some point
 varDict = {}
-functionDict = {}
-
 
 # sample Function entry
 sampleFunc = {
@@ -28,7 +26,6 @@ sampleFunc = {
                 }
 }
 # when calling fucntion do function lookup, if found call FunctionDefVisitor().visitFunctionCode(ctx object found in dict)
-
 functionDict = {}
 
 indentLevel = 0
@@ -144,22 +141,22 @@ class GrammarVisitor(ProjectVisitor):
     # def visitGenericVal(self, ctx: ProjectParser.GenericValContent):
     #     pass
     
-    # def visitIndent(self, ctx: ProjectParser.IndentContext):
-    #     tabArr = ctx.TAB()
+    def visitIndent(self, ctx: ProjectParser.IndentContext):
+        tabArr = ctx.TAB()
         
-    #     count = countTabs(tabArr)
+        count = countTabs(tabArr)
         
-    #     print("TABS: " + str(count))
+        print("TABS: " + str(count))
         
-    #     # ensure no indent error
-    #     if(count > getIndent() + 1):
-    #         print("Indent Error")
-    #         pass
-    #     else:
-    #         print("New indent level")
-    #         setIndent(count)
+        # ensure no indent error
+        if(count > getIndent() + 1):
+            print("Indent Error")
+            pass
+        else:
+            print("New indent level")
+            setIndent(count)
         
-    #     return super().visitIndent(ctx)
+        return super().visitIndent(ctx)
 
 class AssignVisitor(GrammarVisitor):
 
