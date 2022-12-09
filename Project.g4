@@ -232,6 +232,7 @@ eqFirstOrder
 eqVal
     : ATOM
     | VAR
+    | functionCall
     ;
 
 // parser rules used in the equation parse rule

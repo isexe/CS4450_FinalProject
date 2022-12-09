@@ -151,6 +151,8 @@ class GrammarVisitor(ProjectVisitor):
         tabArr = ctx.TAB()
         
         count = countTabs(tabArr)
+        
+        print(count)
 
         # indent by 1
         if(count <= getIndent() + 1):
@@ -518,6 +520,8 @@ class EquationVisitor(GrammarVisitor):
         # is atom value
         elif(ctx.ATOM()):
             result = ctx.ATOM()
+        elif(ctx.functionCall()):
+            result = FunctionCallVisitor(self.debugging).visitFunctionCall(ctx.functionCall())
 
         return result
 
@@ -645,7 +649,7 @@ class IfElseVisitor(GrammarVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = self.visitCode(c)
+            result = self.visit(c)
         
         return result
 
@@ -915,7 +919,7 @@ class ForLoopVisitor(GrammarVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = self.visitCode(c)
+            result = self.visit(c)
         return result
             
 class WhileLoopVisitor(GrammarVisitor):
@@ -947,7 +951,7 @@ class WhileLoopVisitor(GrammarVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = self.visitCode(c)
+            result = self.visit(c)
         
         return result
 
@@ -1042,7 +1046,7 @@ class FunctionCallVisitor(GrammarVisitor):
         return result
 
     def visitParamVal(self, ctx: ProjectParser.ParamValContext):
-        
+        pass
         
 # will count and return the num of tabs
 # if error returns -1
