@@ -30,9 +30,9 @@ to do this will need to figure out how to track indents
 */
 
 
-functionDef
-  : DEF functionID ( '(' paramID (',' paramID)* '):' | '():' ) EOL
-        functionCode
+functionDef :
+    DEF functionID ( '(' paramID (',' paramID)* '):' | '():' ) EOL
+    functionCode
   ;
 
 // can repeat code until a return

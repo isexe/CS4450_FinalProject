@@ -18,6 +18,15 @@ sampleDict = {
 # should create a class for variables at some point
 varDict = {}
 
+
+# sample Function entry
+sampleFunc = {
+    "funcID" : "ctxObject"
+}
+# when calling fucntion do function lookup, if found call FunctionDefVisitor().visitFunctionCode(ctx object found in dict)
+
+functionDict = {}
+
 indentLevel = 0
 
 class UnexpectedError(Exception):
@@ -98,6 +107,15 @@ class GrammarVisitor(ProjectVisitor):
         if(self.debugging):
             print("While loop running")
             # print some debugging statement
+            pass
+
+        return result
+
+    def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
+        result = FunctionDefVisitor().visitFunctionDef(ctx)
+
+        if(self.debugging):
+            print("Function definition")
             pass
 
         return result
