@@ -960,17 +960,6 @@ class FunctionDefVisitor(GrammarVisitor):
             functionDict[functionID] = ctx
         return functionID
 
-    def visitFunctionCode(self, ctx: ProjectParser.FunctionCodeContext):
-        n = ctx.getChildCount()
-        result = None
-
-        for i in range(n):
-            c = ctx.getChild(i)
-
-            result = self.visitCode(c)
-        
-        return result
-
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
         ctx = ctx.functionID()
@@ -985,12 +974,28 @@ class FunctionCallVisitor(GrammarVisitor):
         if(ctxObj == None):
             print(NameError)
             pass
-       
 
-        result = FunctionDefVisitor(self.debugging).visitFunctionCode(ctxObj)
+        for i in ctxObjParams.keys():
+            if(i not in varDict):
+                varDict[i]
+
+        result = self.visitFunctionCode(ctxObj)
 
         return result
+
+    def visitFunctionCode(self, ctx: ProjectParser.FunctionCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor().visit(c)
         
+        return result
+        
+# will count and return the num of tabs
+# if error returns -1
 def countTabs(tabs):
     count = 0
     
