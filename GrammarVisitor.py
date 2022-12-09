@@ -22,7 +22,10 @@ functionDict = {}
 
 # sample Function entry
 sampleFunc = {
-    "funcID" : "ctxObject"
+    "funcID" : {
+                "FunctionCode" : "ctxObject",
+                "ParamArray" : ["paramID1", "etc"]
+                }
 }
 # when calling fucntion do function lookup, if found call FunctionDefVisitor().visitFunctionCode(ctx object found in dict)
 
@@ -974,14 +977,10 @@ class FunctionCallVisitor(GrammarVisitor):
         ctx = ctx.functionID()
         for i in sampleFunc.keys():
             if ctx != i:
-                return False;
-        
-
-    def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
-        return
-
-    def visitParamVal(self, ctx: ProjectParser.ParamValContext):
-        return
+                return False
+            else:
+                result = self.visitFunctionCode()
+                return result
 
 # will count and return the num of tabs
 # if error returns -1
