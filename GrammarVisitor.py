@@ -66,7 +66,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
-        result = IfElseBlock().visitIfElseBlock(ctx)
+        result = IfElseVisitor().visitIfElseBlock(ctx)
 
         if(self.debugging):
             # try to print which statement it would execute, but returns last statement even if none were executed
@@ -77,6 +77,26 @@ class GrammarVisitor(ProjectVisitor):
                 print("None")
         
         # print(varDict)
+
+        return result
+
+    def visitForLoop(self, ctx: ProjectParser.ForLoopContext):
+        result = ForLoopVisitor().visitForLoop(ctx)
+
+        if(self.debugging):
+            print("For loop running")
+            # print some debugging statement
+            pass
+
+        return result
+
+    def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
+        result = WhileLoopVisitor().visitWhileLoop(ctx)
+
+        if(self.debugging):
+            print("While loop running")
+            # print some debugging statement
+            pass
 
         return result
 
@@ -473,7 +493,7 @@ class EquationVisitor(ProjectVisitor):
     def visitSqrt(self, ctx: ProjectParser.SqrtContext):
         return ctx.getText()
 
-class IfElseBlock(ProjectVisitor):
+class IfElseVisitor(ProjectVisitor):
     # This ctx is the parent of all the ifelseblock code, has statement and code sections
     # need to visit children
     # start with if then go through each block
@@ -570,6 +590,25 @@ class IfElseBlock(ProjectVisitor):
         result = LogicVisitor().visitLogicExpr(ctx)
         # print("Result:\t" + str(result))
         return result
+
+    # no idea what this is
+    # def visitWhileStatement(self, ctx: ProjectParser.IfStatementContext):
+    #     ctxLogic = ctx.logicExpr()
+    #     ctxCode = ctx.ifElseCode()
+
+    #     result = None
+    #     logVal = self.visitLogicExpr(ctxLogic)
+
+    #     if(logVal != None):
+    #         if(str(logVal) == "True"):
+    #             logVal = True
+    #         elif(str(logVal) == "False"):
+    #             logVal = False
+
+    #     while(logVal):
+    #         result = self.visitWhileLoop(ctxCode)
+
+    #     return logVal
     
 class LogicVisitor(ProjectVisitor):
 
@@ -697,7 +736,180 @@ class LogicVisitor(ProjectVisitor):
         result = ctx.getText()
         return result
 
-# tr;y converting it to int, if fail not int
+class ForLoopVisitor(ProjectVisitor):
+
+    def visitForLoop(self, ctx:ProjectParser.ForLoopContext):
+        result = None
+        var_val = None
+
+        ctx_id = ctx.id_()
+        ctx_range = ctx.range_()
+
+        result_range = self.visitRange(ctx_range)
+        result_id = self.visitId(ctx_id)
+
+        if(len(result_range) == 1):
+            stop = result_range[0]
+            
+            # do forLoop with stop
+            for i in range(stop):
+                # update var value
+                # if no var exists, create new var with result_id
+                var = varDict.get(result_id)
+                if(var == None):
+                    var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                else:
+                    var["Value"] = i
+                    var["Type"] = type(i)
+
+                self.visitForCode(ctx.forCode())
+
+        elif(len(result_range) == 2):
+            start = result_range[0]
+            stop = result_range[1]
+
+            # do forLoop with start, stop
+            for i in range(start, stop):
+                # update var value
+                # if no var exists, create new var with result_id
+                # update var value
+                # if no var exists, create new var with result_id
+                var = varDict.get(result_id)
+                if(var == None):
+                    var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                else:
+                    var["Value"] = i
+                    var["Type"] = type(i)
+
+                self.visitForCode(ctx.forCode())
+
+        else:
+            start = result_range[0]
+            stop = result_range[1]
+            step = result_range[2]
+
+            # do forLoop with start, stop, step
+            for i in range(start, stop, step):
+                # update var value
+                # if no var exists, create new var with result_id
+                # update var value
+                # if no var exists, create new var with result_id
+                var = varDict.get(result_id)
+                if(var == None):
+                    var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                else:
+                    var["Value"] = i
+                    var["Type"] = type(i)
+
+                self.visitForCode(ctx.forCode())
+
+
+        return result
+
+    def visitId(self, ctx: ProjectParser.IdContext):
+        return str(ctx.VAR())
+
+    def visitRange(self, ctx:ProjectParser.RangeContext):
+        result = self.visitRangeChildren(ctx)
+        return result
+    
+    def visitRangeChildren(self, node):
+        result = None
+        n = node.getChildCount()
+        for i in range(n):
+            if not self.shouldVisitNextChild(node, result):
+                return result
+
+            c = node.getChild(i)
+            child_result = c.accept(self)
+
+            if(child_result != None):
+                child_result = str(child_result)
+
+                # format the result
+                if(isValidInt(child_result)):
+                    child_result = int(child_result)
+                elif(isValidFloat(child_result)):
+                    child_result = float(child_result)
+                elif(isValidBool(child_result)):
+                    if(child_result == "True"):
+                        child_result = True
+                    else:
+                        child_result = False
+
+                if(result == None):
+                    result = [child_result]
+                else:
+                    result.append(child_result)
+
+        return result
+
+    def visitRangeVal(self, ctx:ProjectParser.RangeValContext):
+        result = None
+        if(ctx.VAR()):
+            result = varDict.get(str(ctx.VAR()))
+            if(result == None):
+                raise NameError("name '" + str(ctx.VAR()) + "' is not defined")
+            if(result != None):
+                result = result.get("Value")
+        elif(ctx.ATOM()):
+            result = ctx.ATOM()
+        elif(ctx.equation() != None):
+            result = EquationVisitor().visitEquation(ctx.equation())
+
+        return result
+    
+    # should look identical to ifElseCode
+    def visitForCode(self, ctx:ProjectParser.ForCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor().visit(c)
+        return result
+            
+class WhileLoopVisitor(ProjectVisitor):
+
+    def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.whileCode()
+
+        result = None
+        logVal = self.visitLogicExpr(ctxLogic)
+
+        if(logVal != None):
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
+
+        if(logVal):
+            while(logVal):
+                result = self.visitWhileCode(ctxCode)
+                logVal = self.visitLogicExpr(ctxLogic)
+
+        return result
+
+    def visitWhileCode(self, ctx: ProjectParser.WhileCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor().visit(c)
+        
+        return result
+
+    def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
+        # print("LogExpr:\t" + ctx.getText())
+        result = LogicVisitor().visitLogicExpr(ctx)
+        # print("Result:\t" + str(result))
+        return result
+
+# try converting it to int, if fail not int
 def isValidInt(string):
     try:
         int(str(string))
@@ -714,6 +926,7 @@ def isValidFloat(string):
         return False
 
 # check for True or False
+# !Something is wrong with this so don't use
 def isValidBool(string):
     if str(string) == "True" or str(string) == "False":
         return True
