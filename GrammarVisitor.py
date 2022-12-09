@@ -979,8 +979,8 @@ class FunctionCallVisitor(GrammarVisitor):
 
         for i in ctxObjParams.keys():
             if(i not in varDict):
-                val = { "Address" :id(r_val), "Value" : r_val, "Type" : type(r_val), "Lifetime" : "", "Scope" : ""}
-                varDict[str(l_val)] = val
+                val = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                varDict[str(i)] = val
 
         result = self.visitFunctionCode(ctxObj)
 
