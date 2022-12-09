@@ -990,7 +990,7 @@ class FunctionCallVisitor(GrammarVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = GrammarVisitor().visit(c)
+            result = GrammarVisitor(self.debugging).visit(c)
         
         return result
         
