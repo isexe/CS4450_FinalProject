@@ -934,7 +934,7 @@ class FunctionDefVisitor(GrammarVisitor):
         ctx = ctx.functionID()
         return
 
-    def visitparamIDChildren(self, node):
+    def visitFunctionCode(self, ctx: ProjectParser.FunctionCodeContext):
         return
 
 class FunctionCallVisitor(GrammarVisitor):
