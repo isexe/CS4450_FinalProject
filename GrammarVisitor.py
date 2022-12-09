@@ -933,7 +933,7 @@ class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
         ctx = ctx.functionID()
 
-        
+
         return
 
     def visitFunctionCode(self, ctx: ProjectParser.FunctionCodeContext):
