@@ -18,6 +18,8 @@ sampleDict = {
 # should create a class for variables at some point
 varDict = {}
 
+indentLevel = 0
+
 class UnexpectedError(Exception):
     pass
 
@@ -38,6 +40,7 @@ class GrammarVisitor(ProjectVisitor):
 
     # Visit a parse tree produced by ProjectParser#block.
     def visitBlock(self, ctx: ProjectParser.BlockContext):
+        
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by ProjectParser#statement.
@@ -909,8 +912,8 @@ class WhileLoopVisitor(ProjectVisitor):
         # print("Result:\t" + str(result))
         return result
 
-class FunctionDefinitionVisitor(ProjectVisitor):
-    def visitFunctionDefinition(self, ctx: ProjectParser.FunctionDefinitionContext):
+class FunctionDefVisitor(ProjectVisitor):
+    def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
         return 
 
     def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
@@ -928,6 +931,26 @@ class FunctionCallVisitor(ProjectVisitor):
 
     def visitParamVal(self, ctx: ProjectParser.ParamValContext):
         return
+
+# will count and return the num of tabs
+# if error returns -1
+def countTabs(string):
+    count = 0
+    try:
+        string = str(string)
+        count = string.count("\t")    
+    except:
+        count = -1
+    
+    return count
+
+# inc indent level
+def indent():
+    indentLevel += 1
+
+# dec indent level
+def dedent():
+    indentLevel -= 1
 
 # try converting it to int, if fail not int
 def isValidInt(string):

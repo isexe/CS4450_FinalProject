@@ -5,7 +5,7 @@ code : (block | line)* EOF ;
 
 // blocks of code
 block 
-    : TAB*
+    : indent
     ( ifElseBlock
     | whileLoop
     | forLoop
@@ -14,7 +14,7 @@ block
 
 // each line of code
 line 
-    : TAB* 
+    : indent
     (statement EOL
     | EOL )
     ;
@@ -38,7 +38,7 @@ to do this will need to figure out how to track indents
 functionDef
   : DEF functionID ('(' (paramID (',' paramID)*)? '):' | '():') EOL
       ((line)+
-      | TAB* functionReturn EOL )
+      | indent functionReturn EOL )
   ;
 
 // most likely need to add this to some larger type, maybe equation since that has most things rn
@@ -277,6 +277,8 @@ VAR : [A-Za-z_][0-9A-Za-z_]* ;
 EOL : [\n\r]+ ;
 
 // not impemented yet but tabs are used for scope not WS
+indent : TAB*;
+
 TAB : [\t];
 
 WS : [ ]+ -> skip ;
