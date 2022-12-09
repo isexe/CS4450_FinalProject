@@ -963,31 +963,6 @@ class FunctionDefVisitor(GrammarVisitor):
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
         ctx = ctx.functionID()
-        functionObj = functionDict.get(ctx.functionID())
-
-        if(functionObj == None):
-            print("Function Object not found")
-            pass
-                    
-        # need to create temp variables using param names in ParamArray and setting their value to the paramVal
-        tempVars = functionDict.get("ParamArray")
-
-        # get ctx obj from functionObj
-        ctxObj = functionObj.get("FunctionCode")
-                
-        if(ctxObj == None):
-            print("Context object not found")
-            pass
-
-        result = self.visitFunctionCode(ctxObj)
-
-        # delete param variables you created
-
-        return result
-
-class FunctionCallVisitor(GrammarVisitor):
-    def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
-        ctx = ctx.functionID()
         functionObj = sampleFunc.get(ctx.functionID())
         if(functionObj == None):
             print(NameError)
@@ -999,6 +974,10 @@ class FunctionCallVisitor(GrammarVisitor):
         if(ctxObj == None):
             print(NameError)
             pass
+
+        for i in ctxObjParams.keys():
+            if(i not in varDict):
+                varDict[i]
 
         result = self.visitFunctionCode(ctxObj)
 
