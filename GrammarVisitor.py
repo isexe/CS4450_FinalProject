@@ -102,6 +102,22 @@ class GrammarVisitor(ProjectVisitor):
 
         return result
     
+    def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
+        result = FunctionDefVisitor().visitFunctionDef(ctx)
+        
+        if(self.debugging):
+            print("FunctionDef: " + str(result))
+            
+        return result
+    
+    def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
+        result = FunctionCallVisitor().visitFunctionCall(ctx)
+        
+        if(self.debugging):
+            print("FunctionCall: " + str(result))
+            
+        return result
+    
     # TODO need to implement a generic visitor to handle all the different Val parse rules and combine into one rule
     # def visitGenericVal(self, ctx: ProjectParser.GenericValContent):
     #     pass
