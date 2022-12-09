@@ -8,3 +8,8 @@ antlr4 -Dlanguage=Python3 -visitor Project.g4 -o Grammar
 ```
 
 If you have issues running the Project.py there is most likely a version conflict between python3, Antlr, and Antlr4-Python3-runtime.
+
+When running the Project.py, you can use the following command to print out the debugging results
+```
+python3 Project.py --debugging=True
+```

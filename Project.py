@@ -6,7 +6,17 @@ from Grammar.ProjectParser import ProjectParser
 # information on antlr visitor found at resource #2
 from GrammarVisitor import GrammarVisitor
 
-def main():
+def main(argv):
+    debug = False
+
+    try:
+        if(argv[0] == "--debugging=True"):
+            debug = True
+    except:
+        debug = False
+
+    debug = True
+
     # command-line formatting
     print("pȳthon 0.0.1")
     print("Type Ctrl+D to run, Ctrl+Z to exit")
@@ -26,10 +36,10 @@ def main():
     tree = parser.code()
     
     # use visitor to traverse parse tree
-    result = GrammarVisitor(debugging=True).visitCode(tree)
+    result = GrammarVisitor(debugging=debug).visitCode(tree)
     
     # print("\n--- String Parse Tree ---")
     # print(tree.toStringTree())
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

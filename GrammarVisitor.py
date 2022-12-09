@@ -14,6 +14,8 @@ sampleDict = {
 }
 
 # "stack" that variables are stored ion
+# instead of having dict of dict,
+# should create a class for variables at some point
 varDict = {}
 
 class UnexpectedError(Exception):
@@ -34,6 +36,9 @@ class GrammarVisitor(ProjectVisitor):
     def visitLine(self, ctx:ProjectParser.LineContext):
         return self.visitChildren(ctx)
 
+    # Visit a parse tree produced by ProjectParser#block.
+    def visitBlock(self, ctx: ProjectParser.BlockContext):
+        return self.visitChildren(ctx)
 
     # Visit a parse tree produced by ProjectParser#statement.
     # Will direct to visit parse rule
@@ -57,6 +62,21 @@ class GrammarVisitor(ProjectVisitor):
         if(self.debugging):
             print("Assign '" + str(ctx.getText()) + "':")
             print(result)
+
+        return result
+
+    def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
+        result = IfElseBlock().visitIfElseBlock(ctx)
+
+        if(self.debugging):
+            # try to print which statement it would execute, but returns last statement even if none were executed
+            print("IfElseStatement:")
+            if(result != None):
+                print(str(result + 1))
+            else:
+                print("None")
+        
+        # print(varDict)
 
         return result
 
@@ -88,7 +108,10 @@ class AssignVisitor(ProjectVisitor):
             elif(isValidFloat(r_val)):
                 r_val = float(r_val)
             elif(isValidBool(r_val)):
-                r_val = bool(r_val)
+                if(r_val == "True"):
+                    r_val = True
+                else:
+                    r_val = False
             else:
                 r_val = str(r_val)
 
@@ -163,15 +186,20 @@ class AssignVisitor(ProjectVisitor):
             elif(isValidFloat(val)):
                 val = float(val)
             elif(isValidBool(val)):
-                val = bool(val)
+                if(val == "True"):
+                    val = True
+                else:
+                    val = False
             elif(val == "None"):
                 val = None
             else:
                 val = str(val)
+        elif(ctx.logicExpr() != None):
+            return LogicVisitor().visitLogicExpr(ctx.logicExpr())  
         elif(ctx.equation() != None):
             return EquationVisitor().visitEquation(ctx.equation())
         else:
-            raise UnexpectedError("Assigned value isn't an atom or equation")
+            raise UnexpectedError("Assigned value isn't an atom, equation, or logic expression")
 
         return val
 
@@ -248,7 +276,7 @@ class EquationVisitor(ProjectVisitor):
                     # reset sign value so we know it's next
                     
                 except:
-                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + str(type(result)) + "' and '" + str(type(childResult)) + "'")
                     
                 sign = None
         return result
@@ -303,7 +331,7 @@ class EquationVisitor(ProjectVisitor):
                     else:
                         raise UnexpectedError("Multiplication/Division/Modulo sign was value other than '*', '/', '%'")
                 except:
-                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + str(type(result)) + "' and '" + str(type(childResult)) + "'")
                 
                 sign = None
 
@@ -346,7 +374,7 @@ class EquationVisitor(ProjectVisitor):
                     else:
                         raise UnexpectedError("Power/Square sign was value other than '**', '//'")
                 except:
-                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + type(result) + "' and '" + type(str) + "'")
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + str(type(result)) + "' and '" + str(type(childResult)) + "'")
                 
                 sign = None
 
@@ -377,12 +405,12 @@ class EquationVisitor(ProjectVisitor):
                 try:
                     result = -result
                 except:
-                    raise TypeError("bad operand type for unary -: " + type(result))
+                    raise TypeError("bad operand type for unary -: " + str(type(result)))
             elif(ctx.sign.text == "+"):
                 try:
                     result = +result
                 except:
-                    raise TypeError("bad operand type for unary +: " + type(result))
+                    raise TypeError("bad operand type for unary +: " + str(type(result)))
 
         return result
 
@@ -408,7 +436,6 @@ class EquationVisitor(ProjectVisitor):
             result = ctx.ATOM()
 
         return result
-
 
     # This will get the '*' operator
     # Visit a parse tree produced by ProjectParser#mult.
@@ -446,6 +473,231 @@ class EquationVisitor(ProjectVisitor):
     def visitSqrt(self, ctx: ProjectParser.SqrtContext):
         return ctx.getText()
 
+class IfElseBlock(ProjectVisitor):
+    # This ctx is the parent of all the ifelseblock code, has statement and code sections
+    # need to visit children
+    # start with if then go through each block
+    # break if one returns true
+    def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
+        result = self.visitIfElseBlockChildren(ctx)
+        return result
+
+    # Visit the children of a parse tree produced by ProjectParser#equation.
+    def visitIfElseBlockChildren(self, node):
+        result = None
+        n = node.getChildCount()
+
+        for i in range(n):
+            if not self.shouldVisitNextChild(node, result):
+                return result
+            
+            c = node.getChild(i)
+            result = c.accept(self)
+
+            # print("childresult" + str(result))
+        
+            if(result != None):
+                if(str(result) == "True"):
+                    result = True
+                elif(str(result) == "False"):
+                    result = False
+                
+                if(result):
+                    result = i
+                    break
+
+        return result
+
+    # Need to visit children
+    # if child(logicExpr) and if true, visit child(ifElseCode)
+    # need to return the value from logicExpr
+    def visitIfStatement(self, ctx: ProjectParser.IfStatementContext):
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.ifElseCode()
+
+        result = None
+        logVal = self.visitLogicExpr(ctxLogic)
+
+        if(logVal != None):
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
+
+        if(logVal):
+            result = self.visitIfElseCode(ctxCode)
+
+        return logVal
+
+    def visitElifStatement(self, ctx: ProjectParser.ElifStatementContext):
+        ctxLogic = ctx.logicExpr()
+        ctxCode = ctx.ifElseCode()
+
+        result = None
+        logVal = self.visitLogicExpr(ctxLogic)
+
+        #make result bool
+
+        if(logVal != None):
+            if(str(logVal) == "True"):
+                logVal = True
+            elif(str(logVal) == "False"):
+                logVal = False
+
+        if(logVal):
+            result = self.visitIfElseCode(ctxCode)
+
+        return logVal
+
+    def visitElseStatement(self, ctx: ProjectParser.ElseStatementContext):
+        ctxCode = ctx.ifElseCode()
+        self.visitIfElseCode(ctxCode)
+        return None
+
+    def visitIfElseCode(self, ctx: ProjectParser.IfElseCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor().visit(c)
+        
+        return result
+
+    def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
+        # print("LogExpr:\t" + ctx.getText())
+        result = LogicVisitor().visitLogicExpr(ctx)
+        # print("Result:\t" + str(result))
+        return result
+    
+class LogicVisitor(ProjectVisitor):
+
+    def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
+        result = self.visitLogicExprChildren(ctx)
+        return result
+
+    # need to handle the results from the children nodes
+    def visitLogicExprChildren(self, node):
+        result = None
+        sign = None
+        result_arr = []
+        and_flag = False
+        or_flag = False
+        not_flag = False
+        n = node.getChildCount()
+        for i in range(n):
+            if not self.shouldVisitNextChild(node, result):
+                return result
+
+            c = node.getChild(i)
+            if(c.getText() == "not"):
+                not_flag = True
+                # print("not flag called")
+                continue
+            childResult = c.accept(self)
+
+            if(childResult != None):
+                childResult = str(childResult)
+                # print("ChildResult "+childResult)
+                if(isValidInt(childResult)):
+                    childResult = int(childResult)
+                elif(isValidFloat(childResult)):
+                    childResult = float(childResult)
+                elif(childResult == "and"):
+                    and_flag = True
+                    continue
+                elif(childResult == "or"):
+                    or_flag = True
+                    continue
+                elif(childResult == "False" or childResult == "True"):
+                    result_arr.append(childResult)
+                    # print(result_arr)
+                    if(len(result_arr) > 2):
+                        result_arr.pop(0)
+                    if(and_flag):
+                        # print("and flag called")
+                        if("False" in result_arr):
+                            result = False
+                        else:
+                            result = True
+                    elif(or_flag):
+                        # print("or flag called")
+                        if("True" in result_arr):
+                            result = True
+                        else:
+                            result = False
+                    elif(not_flag):
+                        # print("not flag called")
+                        if("True" in result_arr):
+                            result = False
+                        else:
+                            result = True
+                
+            and_flag = False
+            or_flag = False
+            not_flag = False
+                        
+
+            # if result is none just set it to the first value we found
+            if(result == None):
+                result = childResult
+            # if sign is none then the current child should be a sign operator
+            elif(sign == None):
+                sign = childResult
+            else:
+                try:
+                    if sign == "==":
+                        result = (result == childResult)
+                    elif sign == "!=":
+                        result = (result != childResult)
+                    elif sign == ">=":
+                        result = (result >= childResult)
+                    elif sign == ">":
+                        result = (result > childResult)
+                    elif sign == "<=":
+                        result = (result <= childResult)
+                    elif sign == "<":
+                        result = (result < childResult)
+                    else:
+                        UnexpectedError("Comparison was not valid")
+                except:
+                    raise TypeError("unsupported operand type(s) for " + str(sign) + ": '" + str(type(result)) + "' and '" + str(type(childResult)) + "'")
+
+                result_arr.append(str(result))
+                sign = None
+
+        return result
+
+    def visitLogicConj(self, ctx: ProjectParser.LogicConjContext):
+        # print("LogCong:\t" + ctx.getText())
+        result = ctx.getText()
+        return result
+    
+    def visitLogicVal(self, ctx: ProjectParser.LogicValContext):
+        result = None
+        if(ctx.VAR()):
+            result = varDict.get(str(ctx.VAR()))
+            if(result == None):
+                raise NameError("name '" + str(ctx.VAR()) + "' is not defined")
+            if(result != None):
+                result = result.get("Value")
+        elif(ctx.ATOM()):
+            result = ctx.ATOM()
+        elif(ctx.equation() != None):
+            result = EquationVisitor().visitEquation(ctx.equation())
+
+        # print("LogVal:\t" + ctx.getText() + " = " + str(result))
+        # print("LogVal:\t" + ctx.getText())
+
+        return result
+
+    def visitLogicOp(self, ctx:ProjectParser.LogicOpContext):
+        # print("LogOp:\t" + ctx.getText())
+        result = ctx.getText()
+        return result
+
+# tr;y converting it to int, if fail not int
 def isValidInt(string):
     try:
         int(str(string))
@@ -453,6 +705,7 @@ def isValidInt(string):
     except:
         return False
 
+# try converting it to float, if fail not float
 def isValidFloat(string):
     try:
         float(str(string))
@@ -460,8 +713,18 @@ def isValidFloat(string):
     except:
         return False
 
+# check for True or False
 def isValidBool(string):
     if str(string) == "True" or str(string) == "False":
+        return True
+    else:
+        return False
+
+# check for quotes at front and back
+def isValidString(string):
+    if str(string)[0] == '"' and str(string)[-1] == '"':
+        return True
+    elif str(string)[0] == "'" and str(string)[-1] == "'":
         return True
     else:
         return False
