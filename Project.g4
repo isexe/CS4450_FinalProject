@@ -20,6 +20,7 @@ line : statement? EOL ;
 statement 
     : assign
     | functionCall
+    | functionReturn
     | logicExpr
     | equation
     ;
@@ -34,9 +35,7 @@ functionDef :
 
 // can repeat code until a return
 functionCode
-    : indent functionReturn EOL
-    | indent (block | line)
-        functionCode
+    : (indent (block | line))+
     ;
 
 // most likely need to add this to some larger type, maybe equation since that has most things rn
