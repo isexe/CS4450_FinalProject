@@ -964,9 +964,9 @@ class FunctionDefVisitor(GrammarVisitor):
         paramArray = []
         
         for param in ctx.paramID():
-            if(param.getText() in paramArray):
+            if(str(param.getText()) in paramArray):
                 raise SyntaxError("duplicate argument '" + str(param.getText()) + "' in " + str(functionID) + " definition")
-            paramArray.append(param.getText())
+            paramArray.append(str(param.getText()))
         
         functionVal = {
                         "FunctionCode" : ctx.functionCode(),
@@ -980,17 +980,28 @@ class FunctionDefVisitor(GrammarVisitor):
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
         functionId = str(ctx.functionID().VAR())
+        print("FunctionID: " + str(functionId))
+        # varDict
         functionObj = varDict.get(functionId)
-        
-        paramVal = []
-        
-        for paramVal in ctx.paramVal():
-            val = self.visitParamVal(param)
-            paramVal.append(val)
         
         if(functionObj == None):
             print(NameError)
             pass
+        
+        # funcDict
+        functionObj = functionObj.get("Value")
+        
+        if(functionObj == None):
+            print(NameError)
+            pass
+        
+        paramVal = []
+        
+        for param in ctx.paramVal():
+            val = self.visitParamVal(param)
+            paramVal.append(val)
+        
+        
 
         paramArray = functionObj.get("ParamArray")
         functionCode = functionObj.get("FunctionCode")
