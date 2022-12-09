@@ -17,6 +17,7 @@ sampleDict = {
 # instead of having dict of dict,
 # should create a class for variables at some point
 varDict = {}
+functionDict = {}
 
 
 # sample Function entry
@@ -124,7 +125,7 @@ class GrammarVisitor(ProjectVisitor):
         result = FunctionDefVisitor().visitFunctionDef(ctx)
         
         if(self.debugging):
-            print("FunctionDef: " + str(result))
+            print("FunctionDef: " + str(result.getText()))
             
         return result
     
@@ -949,10 +950,10 @@ class WhileLoopVisitor(GrammarVisitor):
 
 class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
-        ctx = ctx.functionID()
-
-        
-        return
+        functionID = ctx.functionID()
+        if(functionID not in functionDict):
+            functionDict[functionID] = ctx
+        return functionID
 
     def visitFunctionCode(self, ctx: ProjectParser.FunctionCodeContext):
         n = ctx.getChildCount()
