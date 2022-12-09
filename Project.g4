@@ -5,19 +5,14 @@ code : (block | line)* EOF ;
 
 // blocks of code
 block 
-    : indent
-    ( ifElseBlock
+    : ifElseBlock
     | whileLoop
     | forLoop
-    | functionDef )
+    | functionDef
     ;
 
 // each line of code
-line 
-    : indent
-    (statement EOL
-    | EOL )
-    ;
+line : statement? EOL ;
 
 // all the parse rules that need to be followed
 // be careful, currently equation can go straight to atom and overshadow stuff
@@ -34,11 +29,10 @@ TODO need to allow for nested blocks
 to do this will need to figure out how to track indents
 */
 
-// need to include () as option since tokenizes '(' and ')' is difference from '()'
 functionDef
-  : DEF functionID ('(' (paramID (',' paramID)*)? '):' | '():') EOL
-      ((line)+
-      | indent functionReturn EOL )
+  : DEF functionID '(' (paramID (',' paramID)*)? '):' EOL
+      ((TAB line)+
+      | TAB functionReturn EOL)
   ;
 
 // most likely need to add this to some larger type, maybe equation since that has most things rn
@@ -95,8 +89,7 @@ elseStatement
     ;
 
 ifElseCode
-    : (line)+
-    | block
+    : (TAB line)+
     ;
     
 IF: 'if' ;
@@ -110,8 +103,7 @@ whileLoop
     ;
 
 whileCode
-    : (line)+
-    | block
+    : (TAB line)+
     ;
     
 WHILE: 'while';
@@ -123,8 +115,7 @@ forLoop
     ;
     
 forCode
-    : (line)+
-    | block
+    : (TAB line)+
     ;
 
 // can have up to three params
@@ -277,8 +268,6 @@ VAR : [A-Za-z_][0-9A-Za-z_]* ;
 EOL : [\n\r]+ ;
 
 // not impemented yet but tabs are used for scope not WS
-indent : TAB*;
-
 TAB : [\t];
 
 WS : [ ]+ -> skip ;
