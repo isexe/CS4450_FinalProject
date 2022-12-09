@@ -909,6 +909,26 @@ class WhileLoopVisitor(ProjectVisitor):
         # print("Result:\t" + str(result))
         return result
 
+class FunctionDefinitionVisitor(ProjectVisitor):
+    def visitFunctionDefinition(self, ctx: ProjectParser.FunctionDefinitionContext):
+        return 
+
+    def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
+        return
+
+    def visitParamVal(self, ctx: ProjectParser.ParamValContext):
+        return
+
+class FunctionCallVisitor(ProjectVisitor):
+    def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
+        return
+
+    def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
+        return
+
+    def visitParamVal(self, ctx: ProjectParser.ParamValContext):
+        return
+
 # try converting it to int, if fail not int
 def isValidInt(string):
     try:
