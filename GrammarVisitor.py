@@ -60,7 +60,7 @@ class GrammarVisitor(ProjectVisitor):
 
     # Visit a parse tree produced by ProjectParser#equation.
     def visitEquation(self, ctx:ProjectParser.EquationContext):
-        result = EquationVisitor().visitEquation(ctx)
+        result = EquationVisitor(self.debugging).visitEquation(ctx)
 
         # used to debug
         if(self.debugging):
@@ -69,7 +69,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitAssign(self, ctx:ProjectParser.AssignContext):
-        result = AssignVisitor().visitAssign(ctx)
+        result = AssignVisitor(self.debugging).visitAssign(ctx)
 
         if(self.debugging):
             print("Assign '" + str(ctx.getText()) + "':")
@@ -78,7 +78,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
-        result = IfElseVisitor().visitIfElseBlock(ctx)
+        result = IfElseVisitor(self.debugging).visitIfElseBlock(ctx)
 
         if(self.debugging):
             # try to print which statement it would execute, but returns last statement even if none were executed
@@ -93,7 +93,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitForLoop(self, ctx: ProjectParser.ForLoopContext):
-        result = ForLoopVisitor().visitForLoop(ctx)
+        result = ForLoopVisitor(self.debugging).visitForLoop(ctx)
 
         if(self.debugging):
             print("For loop running")
@@ -103,7 +103,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
-        result = WhileLoopVisitor().visitWhileLoop(ctx)
+        result = WhileLoopVisitor(self.debugging).visitWhileLoop(ctx)
 
         if(self.debugging):
             print("While loop running")
@@ -113,7 +113,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
-        result = FunctionDefVisitor().visitFunctionDef(ctx)
+        result = FunctionDefVisitor(self.debugging).visitFunctionDef(ctx)
 
         if(self.debugging):
             print("Function definition")
@@ -122,7 +122,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
     
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
-        result = FunctionDefVisitor().visitFunctionDef(ctx)
+        result = FunctionDefVisitor(self.debugging).visitFunctionDef(ctx)
         
         if(self.debugging):
             print("FunctionDef: " + str(result.getText()))
@@ -130,7 +130,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
     
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
-        result = FunctionCallVisitor().visitFunctionCall(ctx)
+        result = FunctionCallVisitor(self.debugging).visitFunctionCall(ctx)
         
         if(self.debugging):
             print("FunctionCall: " + str(result))
@@ -275,9 +275,9 @@ class AssignVisitor(GrammarVisitor):
             else:
                 val = str(val)
         elif(ctx.logicExpr() != None):
-            return LogicVisitor().visitLogicExpr(ctx.logicExpr())  
+            return LogicVisitor(self.debugging).visitLogicExpr(ctx.logicExpr())  
         elif(ctx.equation() != None):
-            return EquationVisitor().visitEquation(ctx.equation())
+            return EquationVisitor(self.debugging).visitEquation(ctx.equation())
         else:
             raise UnexpectedError("Assigned value isn't an atom, equation, or logic expression")
 
@@ -641,13 +641,13 @@ class IfElseVisitor(GrammarVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = GrammarVisitor().visit(c)
+            result = self.visitCode(c)
         
         return result
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         # print("LogExpr:\t" + ctx.getText())
-        result = LogicVisitor().visitLogicExpr(ctx)
+        result = LogicVisitor(self.debugging).visitLogicExpr(ctx)
         # print("Result:\t" + str(result))
         return result
     
@@ -765,7 +765,7 @@ class LogicVisitor(GrammarVisitor):
         elif(ctx.ATOM()):
             result = ctx.ATOM()
         elif(ctx.equation() != None):
-            result = EquationVisitor().visitEquation(ctx.equation())
+            result = EquationVisitor(self.debugging).visitEquation(ctx.equation())
 
         # print("LogVal:\t" + ctx.getText() + " = " + str(result))
         # print("LogVal:\t" + ctx.getText())
@@ -899,7 +899,7 @@ class ForLoopVisitor(GrammarVisitor):
         elif(ctx.ATOM()):
             result = ctx.ATOM()
         elif(ctx.equation() != None):
-            result = EquationVisitor().visitEquation(ctx.equation())
+            result = EquationVisitor(self.debugging).visitEquation(ctx.equation())
 
         return result
     
@@ -911,7 +911,7 @@ class ForLoopVisitor(GrammarVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = GrammarVisitor().visit(c)
+            result = self.visitCode(c)
         return result
             
 class WhileLoopVisitor(GrammarVisitor):
@@ -943,13 +943,13 @@ class WhileLoopVisitor(GrammarVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = GrammarVisitor().visit(c)
+            result = self.visitCode(c)
         
         return result
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         # print("LogExpr:\t" + ctx.getText())
-        result = LogicVisitor().visitLogicExpr(ctx)
+        result = LogicVisitor(self.debugging).visitLogicExpr(ctx)
         # print("Result:\t" + str(result))
         return result
 
@@ -967,7 +967,7 @@ class FunctionDefVisitor(GrammarVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = GrammarVisitor().visit(c)
+            result = self.visitCode(c)
         
         return result
 
@@ -987,7 +987,7 @@ class FunctionCallVisitor(GrammarVisitor):
             pass
        
 
-        result = FunctionDefVisitor().visitFunctionCode(ctxObj)
+        result = FunctionDefVisitor(self.debugging).visitFunctionCode(ctxObj)
 
         return result
         
