@@ -127,7 +127,7 @@ class GrammarVisitor(ProjectVisitor):
         result = FunctionDefVisitor(self.debugging).visitFunctionDef(ctx)
         
         if(self.debugging):
-            print("FunctionDef: " + str(result.getText()))
+            print("FunctionDef: " + str(result))
             
         return result
     
@@ -957,12 +957,14 @@ class WhileLoopVisitor(GrammarVisitor):
 
 class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
-        functionID = ctx.functionID()
+        functionID = str(ctx.functionID().VAR())
         
         paramArray = []
         
-        for i in ctx.paramID():
-            paramArray.append(i.getText())
+        for param in ctx.paramID():
+            if(param.getText() in paramArray):
+                raise SyntaxError("duplicate argument '" + str(param.getText()) + "' in " + str(functionID) + " definition")
+            paramArray.append(param.getText())
         
         functionVal = {
                         "FunctionCode" : ctx.functionCode(),
@@ -971,7 +973,7 @@ class FunctionDefVisitor(GrammarVisitor):
         
         varDict[functionID] = { "Address" : id(ctx.functionCode()), "Value" : functionVal, "Type" : "<class 'function'>", "Lifetime" : "", "Scope" : ""}
         
-        return functionID
+        return varDict[functionID]
 
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
