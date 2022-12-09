@@ -1040,7 +1040,7 @@ class FunctionCallVisitor(GrammarVisitor):
             val = paramVal[i]
             
             if(paramId not in varDict):
-                val = { "Address" :id(paramId), "Value" : paramVal, "Type" : type(paramVal), "Lifetime" : "", "Scope" : ""}
+                val = { "Address" :id(paramId), "Value" : val, "Type" : type(val), "Lifetime" : "", "Scope" : ""}
                 varDict[paramId] = val
 
         result = self.visitFunctionCode(functionCode)
