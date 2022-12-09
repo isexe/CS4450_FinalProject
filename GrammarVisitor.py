@@ -10,13 +10,27 @@ sampleDict = {
               "Type" : "",      # type(dict["Value"])
               "Lifetime" : "",  # ?
               "Scope" : ""      # ?
+            },
+  "myFunc" : {
+              "Address" : "",   # id(func)
+              "Value" : "",     # should be a dict like sampleFunc below
+              "Type" : "",      # type(dict["Value"])
+              "Lifetime" : "",  # ?
+              "Scope" : ""      # ?
             }
+}
+
+sampleFunc = {
+    "FunctionCode" : "ctxObject",
+    "ParamArray" : ["paramID1", "etc"]
 }
 
 # "stack" that variables are stored ion
 # instead of having dict of dict,
 # should create a class for variables at some point
 varDict = {}
+
+indentLevel = 0
 
 class UnexpectedError(Exception):
     pass
@@ -34,7 +48,10 @@ class GrammarVisitor(ProjectVisitor):
     # Visit a parse tree produced by ProjectParser#line.
     # Next Node is Statement
     def visitLine(self, ctx:ProjectParser.LineContext):
-        return self.visitChildren(ctx)
+        if(ctx.statement()):
+            return self.visitStatement(ctx.statement())
+        else:
+            return None
 
     # Visit a parse tree produced by ProjectParser#block.
     def visitBlock(self, ctx: ProjectParser.BlockContext):
@@ -44,11 +61,15 @@ class GrammarVisitor(ProjectVisitor):
     # Will direct to visit parse rule
     # i.e. 1 + 1 will go to visitEquation next
     def visitStatement(self, ctx:ProjectParser.StatementContext):
+        # need to catch functionReturn here and check if parent was functionDef
+        if(ctx.functionReturn()):
+            return self.visitFunctionReturn(ctx.functionReturn())
+        
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by ProjectParser#equation.
     def visitEquation(self, ctx:ProjectParser.EquationContext):
-        result = EquationVisitor().visitEquation(ctx)
+        result = EquationVisitor(self.debugging).visitEquation(ctx)
 
         # used to debug
         if(self.debugging):
@@ -57,7 +78,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitAssign(self, ctx:ProjectParser.AssignContext):
-        result = AssignVisitor().visitAssign(ctx)
+        result = AssignVisitor(self.debugging).visitAssign(ctx)
 
         if(self.debugging):
             print("Assign '" + str(ctx.getText()) + "':")
@@ -66,7 +87,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitIfElseBlock(self, ctx: ProjectParser.IfElseBlockContext):
-        result = IfElseVisitor().visitIfElseBlock(ctx)
+        result = IfElseVisitor(self.debugging).visitIfElseBlock(ctx)
 
         if(self.debugging):
             # try to print which statement it would execute, but returns last statement even if none were executed
@@ -81,7 +102,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitForLoop(self, ctx: ProjectParser.ForLoopContext):
-        result = ForLoopVisitor().visitForLoop(ctx)
+        result = ForLoopVisitor(self.debugging).visitForLoop(ctx)
 
         if(self.debugging):
             print("For loop running")
@@ -91,7 +112,7 @@ class GrammarVisitor(ProjectVisitor):
         return result
 
     def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
-        result = WhileLoopVisitor().visitWhileLoop(ctx)
+        result = WhileLoopVisitor(self.debugging).visitWhileLoop(ctx)
 
         if(self.debugging):
             print("While loop running")
@@ -100,7 +121,65 @@ class GrammarVisitor(ProjectVisitor):
 
         return result
 
-class AssignVisitor(ProjectVisitor):
+    def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
+        result = FunctionDefVisitor(self.debugging).visitFunctionDef(ctx)
+
+        if(self.debugging):
+            print("Function definition")
+            pass
+
+        return result
+    
+    def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
+        result = FunctionDefVisitor(self.debugging).visitFunctionDef(ctx)
+        
+        if(self.debugging):
+            print("FunctionDef: " + str(result))
+            
+        return result
+    
+    def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
+        result = FunctionCallVisitor(self.debugging).visitFunctionCall(ctx)
+        
+        if(self.debugging):
+            print("FunctionCall: " + str(result))
+            
+        return result
+    
+    def visitReturnVal(self, ctx: ProjectParser.ReturnValContext):
+        result = FunctionDefVisitor(self.debugging).visitReturnVal(ctx)
+        
+        if(self.debugging):
+            print("FuncReturnVal: " + str(result))
+            
+        return result
+    
+    # TODO need to implement a generic visitor to handle all the different Val parse rules and combine into one rule
+    # def visitGenericVal(self, ctx: ProjectParser.GenericValContent):
+    #     pass
+    
+    def visitIndent(self, ctx: ProjectParser.IndentContext):
+        currIndent = getIndent()
+        
+        tabArr = ctx.TAB()
+        
+        count = countTabs(tabArr)
+        
+        print(count)
+
+        # indent by 1
+        if(count <= getIndent() + 1):
+            setIndent(count)
+        elif(count > getIndent() + 1):
+            # need to throw error
+            raise IndentationError("unexpected indent")
+        
+        if(self.debugging and currIndent != getIndent()):
+            print("Indent: " + str(getIndent()))
+        
+        return super().visitIndent(ctx)
+
+class AssignVisitor(GrammarVisitor):
 
     # Visit a parse tree produced by ProjectParser#assign.
     def visitAssign(self, ctx: ProjectParser.AssignContext):
@@ -215,15 +294,15 @@ class AssignVisitor(ProjectVisitor):
             else:
                 val = str(val)
         elif(ctx.logicExpr() != None):
-            return LogicVisitor().visitLogicExpr(ctx.logicExpr())  
+            return LogicVisitor(self.debugging).visitLogicExpr(ctx.logicExpr())  
         elif(ctx.equation() != None):
-            return EquationVisitor().visitEquation(ctx.equation())
+            return EquationVisitor(self.debugging).visitEquation(ctx.equation())
         else:
             raise UnexpectedError("Assigned value isn't an atom, equation, or logic expression")
 
         return val
 
-class EquationVisitor(ProjectVisitor):
+class EquationVisitor(GrammarVisitor):
 
     # Step 1: 
     # Visit a parse tree produced by ProjectParser#equation.
@@ -454,6 +533,8 @@ class EquationVisitor(ProjectVisitor):
         # is atom value
         elif(ctx.ATOM()):
             result = ctx.ATOM()
+        elif(ctx.functionCall()):
+            result = FunctionCallVisitor(self.debugging).visitFunctionCall(ctx.functionCall())
 
         return result
 
@@ -493,7 +574,7 @@ class EquationVisitor(ProjectVisitor):
     def visitSqrt(self, ctx: ProjectParser.SqrtContext):
         return ctx.getText()
 
-class IfElseVisitor(ProjectVisitor):
+class IfElseVisitor(GrammarVisitor):
     # This ctx is the parent of all the ifelseblock code, has statement and code sections
     # need to visit children
     # start with if then go through each block
@@ -581,36 +662,17 @@ class IfElseVisitor(ProjectVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = GrammarVisitor().visit(c)
+            result = self.visit(c)
         
         return result
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         # print("LogExpr:\t" + ctx.getText())
-        result = LogicVisitor().visitLogicExpr(ctx)
+        result = LogicVisitor(self.debugging).visitLogicExpr(ctx)
         # print("Result:\t" + str(result))
         return result
-
-    # no idea what this is
-    # def visitWhileStatement(self, ctx: ProjectParser.IfStatementContext):
-    #     ctxLogic = ctx.logicExpr()
-    #     ctxCode = ctx.ifElseCode()
-
-    #     result = None
-    #     logVal = self.visitLogicExpr(ctxLogic)
-
-    #     if(logVal != None):
-    #         if(str(logVal) == "True"):
-    #             logVal = True
-    #         elif(str(logVal) == "False"):
-    #             logVal = False
-
-    #     while(logVal):
-    #         result = self.visitWhileLoop(ctxCode)
-
-    #     return logVal
     
-class LogicVisitor(ProjectVisitor):
+class LogicVisitor(GrammarVisitor):
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         result = self.visitLogicExprChildren(ctx)
@@ -724,7 +786,7 @@ class LogicVisitor(ProjectVisitor):
         elif(ctx.ATOM()):
             result = ctx.ATOM()
         elif(ctx.equation() != None):
-            result = EquationVisitor().visitEquation(ctx.equation())
+            result = EquationVisitor(self.debugging).visitEquation(ctx.equation())
 
         # print("LogVal:\t" + ctx.getText() + " = " + str(result))
         # print("LogVal:\t" + ctx.getText())
@@ -736,7 +798,7 @@ class LogicVisitor(ProjectVisitor):
         result = ctx.getText()
         return result
 
-class ForLoopVisitor(ProjectVisitor):
+class ForLoopVisitor(GrammarVisitor):
 
     def visitForLoop(self, ctx:ProjectParser.ForLoopContext):
         result = None
@@ -758,6 +820,7 @@ class ForLoopVisitor(ProjectVisitor):
                 var = varDict.get(result_id)
                 if(var == None):
                     var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[str(result_id)] = var
                 else:
                     var["Value"] = i
                     var["Type"] = type(i)
@@ -777,6 +840,7 @@ class ForLoopVisitor(ProjectVisitor):
                 var = varDict.get(result_id)
                 if(var == None):
                     var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[str(result_id)] = var
                 else:
                     var["Value"] = i
                     var["Type"] = type(i)
@@ -797,6 +861,7 @@ class ForLoopVisitor(ProjectVisitor):
                 var = varDict.get(result_id)
                 if(var == None):
                     var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[str(result_id)] = var
                 else:
                     var["Value"] = i
                     var["Type"] = type(i)
@@ -855,7 +920,7 @@ class ForLoopVisitor(ProjectVisitor):
         elif(ctx.ATOM()):
             result = ctx.ATOM()
         elif(ctx.equation() != None):
-            result = EquationVisitor().visitEquation(ctx.equation())
+            result = EquationVisitor(self.debugging).visitEquation(ctx.equation())
 
         return result
     
@@ -867,10 +932,10 @@ class ForLoopVisitor(ProjectVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = GrammarVisitor().visit(c)
+            result = self.visit(c)
         return result
             
-class WhileLoopVisitor(ProjectVisitor):
+class WhileLoopVisitor(GrammarVisitor):
 
     def visitWhileLoop(self, ctx: ProjectParser.WhileLoopContext):
         ctxLogic = ctx.logicExpr()
@@ -899,15 +964,134 @@ class WhileLoopVisitor(ProjectVisitor):
         for i in range(n):
             c = ctx.getChild(i)
 
-            result = GrammarVisitor().visit(c)
+            result = self.visit(c)
         
         return result
 
     def visitLogicExpr(self, ctx: ProjectParser.LogicExprContext):
         # print("LogExpr:\t" + ctx.getText())
-        result = LogicVisitor().visitLogicExpr(ctx)
+        result = LogicVisitor(self.debugging).visitLogicExpr(ctx)
         # print("Result:\t" + str(result))
         return result
+
+class FunctionDefVisitor(GrammarVisitor):
+    def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
+        functionID = str(ctx.functionID().VAR())
+        
+        paramArray = []
+        
+        for param in ctx.paramID():
+            if(str(param.getText()) in paramArray):
+                raise SyntaxError("duplicate argument '" + str(param.getText()) + "' in " + str(functionID) + " definition")
+            paramArray.append(str(param.getText()))
+        
+        functionVal = {
+                        "FunctionCode" : ctx.functionCode(),
+                        "ParamArray" : paramArray
+                       }
+        
+        varDict[functionID] = { "Address" : id(ctx.functionCode()), "Value" : functionVal, "Type" : "<class 'function'>", "Lifetime" : "", "Scope" : ""}
+        
+        return varDict[functionID]
+    
+    def visitReturnVal(self, ctx: ProjectParser.ReturnValContext):
+        ctxVal = AssignVisitor(self.debugging).visitAssign_val(ctx)
+        
+        return ctxVal
+
+class FunctionCallVisitor(GrammarVisitor):
+    def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
+        functionId = str(ctx.functionID().VAR())
+        print("FunctionID: " + str(functionId))
+        # varDict
+        functionObj = varDict.get(functionId)
+        
+        if(functionObj == None):
+            print(NameError)
+            pass
+        
+        # funcDict
+        functionObj = functionObj.get("Value")
+        
+        if(functionObj == None):
+            print(NameError)
+            pass
+        
+        paramVal = []
+        
+        for param in ctx.paramVal():
+            val = self.visitParamVal(param)
+            paramVal.append(val)
+        
+        paramArray = functionObj.get("ParamArray")
+        functionCode = functionObj.get("FunctionCode")
+        
+        if(functionCode == None):
+            print(NameError)
+            pass
+
+        # handle if too many to too little parameters are passed in
+        if(len(paramArray) != len(paramVal)):
+            print(TypeError)
+            pass
+
+        for i in range(len(paramArray)):
+            paramId = paramArray[i]
+            val = paramVal[i]
+            
+            if(paramId not in varDict):
+                val = { "Address" :id(paramId), "Value" : val, "Type" : type(val), "Lifetime" : "", "Scope" : ""}
+                varDict[paramId] = val
+
+        result = self.visitFunctionCode(functionCode)
+
+        return result
+
+    def visitFunctionCode(self, ctx: ProjectParser.FunctionCodeContext):
+        n = ctx.getChildCount()
+        result = None
+
+        for i in range(n):
+            c = ctx.getChild(i)
+
+            result = GrammarVisitor(self.debugging).visit(c)
+        
+        return result
+
+    def visitParamVal(self, ctx: ProjectParser.ParamValContext):
+        ctxVal = AssignVisitor(self.debugging).visitAssign_val(ctx)
+        return ctxVal
+        
+# will count and return the num of tabs
+# if error returns -1
+def countTabs(tabs):
+    count = 0
+    
+    if(type(tabs) is str):
+        count = tabs.count("\t")
+    elif(type(tabs) is list):
+        count = len(tabs)
+    else:
+        count = -1
+    
+    return count
+
+# inc indent level
+def indent():
+    indentLevel += 1
+
+# dec indent level
+def dedent():
+    indentLevel -= 1
+    
+# get indentLevel
+def getIndent():
+    return indentLevel
+
+# set indentLevel
+def setIndent(val):
+    global indentLevel
+    indentLevel = val
 
 # try converting it to int, if fail not int
 def isValidInt(string):

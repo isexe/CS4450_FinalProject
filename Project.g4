@@ -1,13 +1,5 @@
 grammar Project;
 
-// information on how to reserve words that variables ca not use was found at resource #5
-// as you need to use these remove them from list and insert them in the section you used them
-// i.e. if section now has lexer rule for IF and ELSE
-RESERVED_WORD 
-    : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' | 'return' | 'null' | 'this' 
-    | 'new' | 'String' | 'str' | 'int' | 'float' | 'complex'| 'list' | 'tuple'
-    | 'dict' | 'set' | 'frozenset' | 'bool' | 'bytes' | 'bytearray' | 'memoryview' | 'nonetype';
-
 // compile all the code
 code : (block | line)* EOF ;
 
@@ -16,30 +8,114 @@ block
     : ifElseBlock
     | whileLoop
     | forLoop
+    | functionDef
     ;
 
 // each line of code
-line : statement EOL
-    | EOL ;
+line : statement? EOL ;
 
 // all the parse rules that need to be followed
 // be careful, currently equation can go straight to atom and overshadow stuff
 // with the addition of declare make sure to keep equation at the bottom
 statement 
     : assign
+    | functionCall
+    | functionReturn
     | logicExpr
     | equation
     ;
 
-/* 
-TODO need to allow for nested blocks
-to do this will need to figure out how to track indents
-*/
+/***
+** FUNCTION STUFF
+***/
+functionDef :
+    DEF functionID ( '(' paramID (',' paramID)* '):' | '():' ) EOL
+        functionCode
+  ;
 
+// can repeat code until a return
+functionCode
+    : (indent (block | line))+
+    ;
+
+// most likely need to add this to some larger type, maybe equation since that has most things rn
+functionCall
+  : functionID ('(' paramVal (',' paramVal)* ')' | '()')
+  ;
+
+functionReturn
+    : RETURN returnVal
+    ;
+
+
+returnVal
+    : VAR
+    | ATOM
+    | logicExpr
+    | equation 
+    ;
+
+RETURN : 'return' ;
+
+functionID : VAR ;
+
+paramID : VAR ;
+paramVal 
+    : VAR
+    | ATOM
+    | equation 
+    ;
+
+DEF : 'def' ;
+
+/***
+** LOOP STUFF
+***/
+// while loop
+whileLoop
+    : ((WHILE logicExpr (':')) EOL
+    | (WHILE ('(') logicExpr ('):')) EOL)
+        whileCode
+    ;
+
+whileCode
+    : (indent (block | line))+
+    ;
+    
+WHILE: 'while';
+
+// for loop
+forLoop
+    : (FOR id IN RANGE ('(') range ('):')) EOL
+        forCode
+    ;
+    
+forCode
+    : (indent (block | line))+
+    ;
+
+range
+    :  rangeVal (',' rangeVal (',' rangeVal)?)?
+    ;
+
+rangeVal
+    : VAR
+    | ATOM 
+    | equation
+    ;
+
+FOR: 'for';
+IN: 'in';
+RANGE: 'range';
+
+/***
+** LOGICAL STUFF
+***/
+// if/else statment
 ifElseBlock :
     ifStatement
-    (elifStatement)*
-    (elseStatement)?
+    (indent* elifStatement)*
+    (indent* elseStatement)?
     ;
 
 
@@ -61,62 +137,14 @@ elseStatement
     ;
 
 ifElseCode
-    : (TAB line)+
+    : (indent (block | line))+
     ;
     
 IF: 'if' ;
 ELIF: 'elif' ;
 ELSE: 'else' ;
 
-whileLoop
-    : ((WHILE logicExpr (':')) EOL
-    | (WHILE ('(') logicExpr ('):')) EOL)
-        whileCode
-    ;
-
-whileCode
-    : (TAB line)+
-    ;
-    
-WHILE: 'while';
-
-// this works, but is super ugly
-forLoop
-    : (FOR id IN RANGE ('(') range ('):')) EOL
-        forCode
-    ;
-
-// can have up to three params
-// could change to just equation, but logicVal allows for shorter parse tree
-range
-    :  rangeVal (',' rangeVal (',' rangeVal)?)?
-    ;
-
-rangeVal
-    : VAR
-    | ATOM 
-    | equation
-    ;
-
-// forLoop
-//     : (FOR id IN RANGE '(' rangeParam '):') EOL
-//         forCode
-//     ;
-
-// rangeParam
-//     : stop=equation
-//     | start=equation ',' stop=equation
-//     | start=equation ',' stop=equation ',' step=equation
-//     ;
-
-forCode
-    : (TAB line)+
-    ;
-
-FOR: 'for';
-IN: 'in';
-RANGE: 'range';
-
+// logical Expression
 logicExpr 
     : '('? (NOT)? (logicVal (logicOp logicVal)*) ')'? (logicConj '('? logicExpr ')'?)*
     ;
@@ -145,6 +173,9 @@ AND : 'and' ;
 OR : 'or' ;
 NOT : 'not' ;
 
+/***
+** ASSIGN STUFF
+***/
 // parser rule for assignment
 // information on assignemnt operators found at resource #4
 assign
@@ -173,13 +204,15 @@ MIN_EQU : '-=' ;
 MULT_EQU : '*=' ;
 DIV_EQU : '/=' ;
 
+/***
+** ARITHMETIC STUFF
+***/
 //*** NOTES
 // Arithmetic rule
 // grows one way rather than both to fix ambiguity
 // changed lexer rules to parse rules
 // broke apart into seperate rules for neatness and more control
 // Depth First Search so important at bottom
-
 
 // parser rule for arithmetic
 equation : eqFourthOrder ;
@@ -199,6 +232,7 @@ eqFirstOrder
 eqVal
     : ATOM
     | VAR
+    | functionCall
     ;
 
 // parser rules used in the equation parse rule
@@ -213,6 +247,10 @@ mod : '%' ;
 add : '+' ;
 sub : '-' ;
 
+
+/***
+** GENERAL HOUSE KEEPING STUFF
+***/
 // rule for defining datatypes
 ATOM
     : NUM
@@ -251,8 +289,18 @@ VAR : [A-Za-z_][0-9A-Za-z_]* ;
 EOL : [\n\r]+ ;
 
 // not impemented yet but tabs are used for scope not WS
+indent : TAB+ ;
+
 TAB : [\t];
 
 WS : [ ]+ -> skip ;
 
 COMMENTS : '#' (NUM | [A-Za-z,.<>/?'";:!@#$%^&*()\-_] | WS | TAB)* -> skip ;
+
+// TODO
+// genericVal
+//     : VAR
+//     | ATOM
+//     | functionCall
+//     | equation 
+//     ;
