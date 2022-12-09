@@ -958,6 +958,31 @@ class FunctionDefVisitor(GrammarVisitor):
             functionDict[functionID] = ctx
         return functionID
 
+class FunctionCallVisitor(GrammarVisitor):
+    def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
+        ctx = ctx.functionID()
+        functionObj = functionDict.get(ctx.functionID())
+
+        if(functionObj == None):
+            print("Function Object not found")
+            pass
+                    
+        # need to create temp variables using param names in ParamArray and setting their value to the paramVal
+        tempVars = functionDict.get("ParamArray")
+
+        # get ctx obj from functionObj
+        ctxObj = functionObj.get("FunctionCode")
+                
+        if(ctxObj == None):
+            print("Context object not found")
+            pass
+
+        result = self.visitFunctionCode(ctxObj)
+
+        # delete param variables you created
+
+        return result
+
     def visitFunctionCode(self, ctx: ProjectParser.FunctionCodeContext):
         n = ctx.getChildCount()
         result = None
@@ -968,16 +993,6 @@ class FunctionDefVisitor(GrammarVisitor):
             result = GrammarVisitor().visit(c)
         
         return result
-
-class FunctionCallVisitor(GrammarVisitor):
-    def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
-        ctx = ctx.functionID()
-        for i in sampleFunc.keys():
-            if ctx != i:
-                return False
-            else:
-                result = self.visitFunctionCode()
-                return result
 
 # will count and return the num of tabs
 # if error returns -1
