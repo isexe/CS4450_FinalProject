@@ -111,6 +111,26 @@ class GrammarVisitor(ProjectVisitor):
 
         return result
     
+    def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
+        result = FunctionDefVisitor().visitFunctionDef(ctx)
+        
+        if(self.debugging):
+            print("FunctionDef: " + str(result))
+            
+        return result
+    
+    def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
+        result = FunctionCallVisitor().visitFunctionCall(ctx)
+        
+        if(self.debugging):
+            print("FunctionCall: " + str(result))
+            
+        return result
+    
+    # TODO need to implement a generic visitor to handle all the different Val parse rules and combine into one rule
+    # def visitGenericVal(self, ctx: ProjectParser.GenericValContent):
+    #     pass
+    
     # def visitIndent(self, ctx: ProjectParser.IndentContext):
     #     tabArr = ctx.TAB()
         
@@ -920,17 +940,16 @@ class WhileLoopVisitor(GrammarVisitor):
 
 class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
-        return 
-
-    def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
+        ctx = ctx.functionID()
         return
 
-    def visitParamVal(self, ctx: ProjectParser.ParamValContext):
+    def visitparamIDChildren(self, node):
         return
 
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
-        return
+        ctx = ctx.functionID()
+        
 
     def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
         return
