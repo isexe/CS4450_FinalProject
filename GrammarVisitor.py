@@ -1001,8 +1001,6 @@ class FunctionCallVisitor(GrammarVisitor):
             val = self.visitParamVal(param)
             paramVal.append(val)
         
-        
-
         paramArray = functionObj.get("ParamArray")
         functionCode = functionObj.get("FunctionCode")
         
