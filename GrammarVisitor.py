@@ -1001,8 +1001,6 @@ class FunctionCallVisitor(GrammarVisitor):
             val = self.visitParamVal(param)
             paramVal.append(val)
         
-        
-
         paramArray = functionObj.get("ParamArray")
         functionCode = functionObj.get("FunctionCode")
         
@@ -1010,11 +1008,12 @@ class FunctionCallVisitor(GrammarVisitor):
             print(NameError)
             pass
 
+        # handle if too many to too little parameters are passed in
+        if(len(paramArray) != len(paramVal)):
+            print(TypeError)
+            pass
+
         for i in range(len(paramArray)):
-            if(i >= len(paramVal)):
-                # handle if too few parameters are passed in
-                pass
-            
             paramId = paramArray[i]
             val = paramVal[i]
             
