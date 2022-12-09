@@ -911,17 +911,16 @@ class WhileLoopVisitor(GrammarVisitor):
 
 class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
-        return 
-
-    def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
+        ctx = ctx.functionID()
         return
 
-    def visitParamVal(self, ctx: ProjectParser.ParamValContext):
+    def visitparamIDChildren(self, node):
         return
 
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
-        return
+        ctx = ctx.functionID()
+        
 
     def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
         return
