@@ -142,19 +142,21 @@ class GrammarVisitor(ProjectVisitor):
     #     pass
     
     def visitIndent(self, ctx: ProjectParser.IndentContext):
+        currIndent = getIndent()
+        
         tabArr = ctx.TAB()
         
         count = countTabs(tabArr)
-        
-        print("TABS: " + str(count))
-        
-        # ensure no indent error
-        if(count > getIndent() + 1):
-            print("Indent Error")
-            pass
-        else:
-            print("New indent level")
+
+        # indent by 1
+        if(count <= getIndent() + 1):
             setIndent(count)
+        elif(count > getIndent() + 1):
+            # need to throw error
+            raise IndentationError("unexpected indent")
+        
+        if(self.debugging and currIndent != getIndent()):
+            print("Indent: " + str(getIndent()))
         
         return super().visitIndent(ctx)
 
@@ -1037,11 +1039,12 @@ def dedent():
     indentLevel -= 1
     
 # get indentLevel
-
 def getIndent():
     return indentLevel
 
+# set indentLevel
 def setIndent(val):
+    global indentLevel
     indentLevel = val
 
 # try converting it to int, if fail not int
