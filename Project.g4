@@ -1,32 +1,30 @@
 grammar Project;
 
-// information on how to reserve words that variables ca not use was found at resource #5
-// as you need to use these remove them from list and insert them in the section you used them
-// i.e. if section now has lexer rule for IF and ELSE
-RESERVED_WORD 
-    : 'class' | 'public' | 'static' | 'extends' | 'void' | 'boolean' | 'return' | 'null' | 'this' 
-    | 'new' | 'String' | 'str' | 'int' | 'float' | 'complex'| 'list' | 'tuple'
-    | 'dict' | 'set' | 'frozenset' | 'bool' | 'bytes' | 'bytearray' | 'memoryview' | 'nonetype';
-
 // compile all the code
 code : (block | line)* EOF ;
 
 // blocks of code
 block 
-    : ifElseBlock
+    : TAB*
+    ( ifElseBlock
     | whileLoop
     | forLoop
+    | functionDef )
     ;
 
 // each line of code
-line : statement EOL
-    | EOL ;
+line 
+    : TAB* 
+    (statement EOL
+    | EOL )
+    ;
 
 // all the parse rules that need to be followed
 // be careful, currently equation can go straight to atom and overshadow stuff
 // with the addition of declare make sure to keep equation at the bottom
 statement 
     : assign
+    | functionCall
     | logicExpr
     | equation
     ;
@@ -36,21 +34,39 @@ TODO need to allow for nested blocks
 to do this will need to figure out how to track indents
 */
 
-functionDefinition
-  : DEF functionID '(' (paramID (',' paramID)*)? '):' EOL
-      (TAB line)+  // again this needs to be reworked
+// need to include () as option since tokenizes '(' and ')' is difference from '()'
+functionDef
+  : DEF functionID ('(' (paramID (',' paramID)*)? '):' | '():') EOL
+      ((line)+
+      | TAB* functionReturn EOL )
   ;
 
 // most likely need to add this to some larger type, maybe equation since that has most things rn
 functionCall
-  : functionID '(' (paramVal (',' paramVal)*)? ')'
+  : functionID ('(' paramVal (',' paramVal)* ')' | '()')
   ;
+
+functionReturn
+    : RETURN returnVal
+    ;
+
+returnVal
+    : VAR
+    | ATOM
+    | functionCall
+    | equation 
+    ;
+
+RETURN : 'return' ;
 
 functionID : VAR ; // might be something different, don't remember naming rules
 
 paramID : VAR ;
-// needs to be able to most other values and types
-paramVal : equation ;
+paramVal 
+    : VAR
+    | ATOM
+    | equation 
+    ;
 
 DEF : 'def' ;
 
@@ -79,7 +95,8 @@ elseStatement
     ;
 
 ifElseCode
-    : (TAB line)+
+    : (line)+
+    | block
     ;
     
 IF: 'if' ;
@@ -93,7 +110,8 @@ whileLoop
     ;
 
 whileCode
-    : (TAB line)+
+    : (line)+
+    | block
     ;
     
 WHILE: 'while';
@@ -102,6 +120,11 @@ WHILE: 'while';
 forLoop
     : (FOR id IN RANGE ('(') range ('):')) EOL
         forCode
+    ;
+    
+forCode
+    : (line)+
+    | block
     ;
 
 // can have up to three params
@@ -114,21 +137,6 @@ rangeVal
     : VAR
     | ATOM 
     | equation
-    ;
-
-// forLoop
-//     : (FOR id IN RANGE '(' rangeParam '):') EOL
-//         forCode
-//     ;
-
-// rangeParam
-//     : stop=equation
-//     | start=equation ',' stop=equation
-//     | start=equation ',' stop=equation ',' step=equation
-//     ;
-
-forCode
-    : (TAB line)+
     ;
 
 FOR: 'for';
