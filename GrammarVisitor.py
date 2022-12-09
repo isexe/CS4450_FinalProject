@@ -976,6 +976,11 @@ class FunctionDefVisitor(GrammarVisitor):
         varDict[functionID] = { "Address" : id(ctx.functionCode()), "Value" : functionVal, "Type" : "<class 'function'>", "Lifetime" : "", "Scope" : ""}
         
         return varDict[functionID]
+    
+    def visitReturnVal(self, ctx: ProjectParser.ReturnValContext):
+        ctxVal = AssignVisitor(self.debugging).visitAssign_val(ctx)
+        
+        return ctxVal
 
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):

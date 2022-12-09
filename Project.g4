@@ -51,7 +51,7 @@ functionReturn
 returnVal
     : VAR
     | ATOM
-    | functionCall
+    | logicExpr
     | equation 
     ;
 
