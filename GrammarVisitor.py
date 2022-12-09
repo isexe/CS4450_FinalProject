@@ -974,15 +974,23 @@ class FunctionDefVisitor(GrammarVisitor):
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
         ctx = ctx.functionID()
-        for i in sampleFunc.keys():
-            if ctx != i:
-                return False
-            else:
-                result = self.visitFunctionCode()
-                return result
+        functionObj = sampleFunc.get(ctx.functionID())
+        if(functionObj == None):
+            print(NameError)
+            pass
 
-# will count and return the num of tabs
-# if error returns -1
+        ctxObjParams = functionObj.get("ParamArray")
+        ctxObj = functionObj.get("FunctionCode")
+        
+        if(ctxObj == None):
+            print(NameError)
+            pass
+       
+
+        result = FunctionDefVisitor().visitFunctionCode(ctxObj)
+
+        return result
+        
 def countTabs(tabs):
     count = 0
     
