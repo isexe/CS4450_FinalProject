@@ -10,23 +10,25 @@ sampleDict = {
               "Type" : "",      # type(dict["Value"])
               "Lifetime" : "",  # ?
               "Scope" : ""      # ?
+            },
+  "myFunc" : {
+              "Address" : "",   # id(func)
+              "Value" : "",     # should be a dict like sampleFunc below
+              "Type" : "",      # type(dict["Value"])
+              "Lifetime" : "",  # ?
+              "Scope" : ""      # ?
             }
+}
+
+sampleFunc = {
+    "FunctionCode" : "ctxObject",
+    "ParamArray" : ["paramID1", "etc"]
 }
 
 # "stack" that variables are stored ion
 # instead of having dict of dict,
 # should create a class for variables at some point
 varDict = {}
-
-# sample Function entry
-sampleFunc = {
-    "funcID" : {
-                "FunctionCode" : "ctxObject",
-                "ParamArray" : ["paramID1", "etc"]
-                }
-}
-# when calling fucntion do function lookup, if found call FunctionDefVisitor().visitFunctionCode(ctx object found in dict)
-functionDict = {}
 
 indentLevel = 0
 
@@ -956,7 +958,7 @@ class WhileLoopVisitor(GrammarVisitor):
 class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
         functionID = ctx.functionID()
-        if(functionID not in functionDict):
+        if(functionID not in varDict):
             functionDict[functionID] = ctx
         return functionID
 
