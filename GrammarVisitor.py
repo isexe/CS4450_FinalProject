@@ -22,7 +22,10 @@ functionDict = {}
 
 # sample Function entry
 sampleFunc = {
-    "funcID" : "ctxObject"
+    "funcID" : {
+                "FunctionCode" : "ctxObject",
+                "ParamArray" : ["paramID1", "etc"]
+                }
 }
 # when calling fucntion do function lookup, if found call FunctionDefVisitor().visitFunctionCode(ctx object found in dict)
 
