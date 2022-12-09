@@ -973,7 +973,8 @@ class FunctionCallVisitor(GrammarVisitor):
             if ctx != i:
                 return False
             else:
-                self.visitFunctionCode()
+                result = self.visitFunctionCode()
+                return result
         
 
     def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
