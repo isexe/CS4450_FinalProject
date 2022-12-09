@@ -17,8 +17,6 @@ sampleDict = {
 # instead of having dict of dict,
 # should create a class for variables at some point
 varDict = {}
-functionDict = {}
-
 
 # sample Function entry
 sampleFunc = {
@@ -28,7 +26,6 @@ sampleFunc = {
                 }
 }
 # when calling fucntion do function lookup, if found call FunctionDefVisitor().visitFunctionCode(ctx object found in dict)
-
 functionDict = {}
 
 indentLevel = 0
@@ -144,22 +141,22 @@ class GrammarVisitor(ProjectVisitor):
     # def visitGenericVal(self, ctx: ProjectParser.GenericValContent):
     #     pass
     
-    # def visitIndent(self, ctx: ProjectParser.IndentContext):
-    #     tabArr = ctx.TAB()
+    def visitIndent(self, ctx: ProjectParser.IndentContext):
+        tabArr = ctx.TAB()
         
-    #     count = countTabs(tabArr)
+        count = countTabs(tabArr)
         
-    #     print("TABS: " + str(count))
+        print("TABS: " + str(count))
         
-    #     # ensure no indent error
-    #     if(count > getIndent() + 1):
-    #         print("Indent Error")
-    #         pass
-    #     else:
-    #         print("New indent level")
-    #         setIndent(count)
+        # ensure no indent error
+        if(count > getIndent() + 1):
+            print("Indent Error")
+            pass
+        else:
+            print("New indent level")
+            setIndent(count)
         
-    #     return super().visitIndent(ctx)
+        return super().visitIndent(ctx)
 
 class AssignVisitor(GrammarVisitor):
 
@@ -800,6 +797,7 @@ class ForLoopVisitor(GrammarVisitor):
                 var = varDict.get(result_id)
                 if(var == None):
                     var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[str(result_id)] = var
                 else:
                     var["Value"] = i
                     var["Type"] = type(i)
@@ -819,6 +817,7 @@ class ForLoopVisitor(GrammarVisitor):
                 var = varDict.get(result_id)
                 if(var == None):
                     var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[str(result_id)] = var
                 else:
                     var["Value"] = i
                     var["Type"] = type(i)
@@ -839,6 +838,7 @@ class ForLoopVisitor(GrammarVisitor):
                 var = varDict.get(result_id)
                 if(var == None):
                     var = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[str(result_id)] = var
                 else:
                     var["Value"] = i
                     var["Type"] = type(i)
@@ -994,6 +994,26 @@ class FunctionCallVisitor(GrammarVisitor):
         
         return result
 
+class FunctionCallVisitor(GrammarVisitor):
+    def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
+        ctx = ctx.functionID()
+        functionObj = sampleFunc.get(ctx.functionID())
+        if(functionObj == None):
+            print(NameError)
+            pass
+
+        ctxObjParams = functionObj.get("ParamArray")
+        ctxObj = functionObj.get("FunctionCode")
+        
+        if(ctxObj == None):
+            print(NameError)
+            pass
+       
+
+        result = FunctionDefVisitor().visitFunctionCode(ctxObj)
+
+        return result
+        
 # will count and return the num of tabs
 # if error returns -1
 def countTabs(tabs):
