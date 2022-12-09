@@ -958,8 +958,19 @@ class WhileLoopVisitor(GrammarVisitor):
 class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
         functionID = ctx.functionID()
-        if(functionID not in varDict):
-            functionDict[functionID] = ctx
+        
+        paramArray = []
+        
+        for i in ctx.paramID():
+            paramArray.append(i.getText())
+        
+        functionVal = {
+                        "FunctionCode" : ctx.functionCode(),
+                        "ParamArray" : paramArray
+                       }
+        
+        varDict[functionID] = { "Address" : id(ctx.functionCode()), "Value" : functionVal, "Type" : "<class 'function'>", "Lifetime" : "", "Scope" : ""}
+        
         return functionID
 
 class FunctionCallVisitor(GrammarVisitor):
