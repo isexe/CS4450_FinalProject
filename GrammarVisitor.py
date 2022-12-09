@@ -48,7 +48,10 @@ class GrammarVisitor(ProjectVisitor):
     # Visit a parse tree produced by ProjectParser#line.
     # Next Node is Statement
     def visitLine(self, ctx:ProjectParser.LineContext):
-        return self.visitChildren(ctx)
+        if(ctx.statement()):
+            return self.visitStatement(ctx.statement())
+        else:
+            return None
 
     # Visit a parse tree produced by ProjectParser#block.
     def visitBlock(self, ctx: ProjectParser.BlockContext):
@@ -59,6 +62,8 @@ class GrammarVisitor(ProjectVisitor):
     # i.e. 1 + 1 will go to visitEquation next
     def visitStatement(self, ctx:ProjectParser.StatementContext):
         # need to catch functionReturn here and check if parent was functionDef
+        if(ctx.functionReturn()):
+            return self.visitFunctionReturn(ctx.functionReturn())
         
         return self.visitChildren(ctx)
 
@@ -138,6 +143,14 @@ class GrammarVisitor(ProjectVisitor):
         
         if(self.debugging):
             print("FunctionCall: " + str(result))
+            
+        return result
+    
+    def visitReturnVal(self, ctx: ProjectParser.ReturnValContext):
+        result = FunctionDefVisitor(self.debugging).visitReturnVal(ctx)
+        
+        if(self.debugging):
+            print("FuncReturnVal: " + str(result))
             
         return result
     
