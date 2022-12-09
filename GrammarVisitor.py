@@ -957,28 +957,34 @@ class FunctionDefVisitor(GrammarVisitor):
     def visitFunctionDef(self, ctx: ProjectParser.FunctionDefContext):
         functionID = ctx.functionID()
         if(functionID not in functionDict):
-            functionDict[functionID] = ctx
+            functionDict[functionID.getText()] = ctx
         return functionID
 
 class FunctionCallVisitor(GrammarVisitor):
     def visitFunctionCall(self, ctx: ProjectParser.FunctionCallContext):
-        ctx = ctx.functionID()
-        functionObj = sampleFunc.get(ctx.functionID())
+        functionObj = functionDict[ctx.functionID().getText()]
         if(functionObj == None):
             print(NameError)
             pass
 
-        ctxObjParams = functionObj.get("ParamArray")
-        ctxObj = functionObj.get("FunctionCode")
+        ctxObjParams = functionObj.paramID()
+        ctxObj = functionObj.functionCode()
+
+        paramValues = ctx.paramVal()
         
         if(ctxObj == None):
             print(NameError)
             pass
 
-        for i in ctxObjParams.keys():
-            if(i not in varDict):
-                val = { "Address" :id(r_val), "Value" : r_val, "Type" : type(r_val), "Lifetime" : "", "Scope" : ""}
-                varDict[str(l_val)] = val
+        if(len(ctxObjParams) != len(paramValues)):
+            print(NameError)
+            pass
+
+        for i in ctxObjParams:
+            for j in paramValues:
+                if(i not in varDict):
+                    val = { "Address" :id(i), "Value" : i, "Type" : type(i), "Lifetime" : "", "Scope" : ""}
+                    varDict[j] = val
 
         result = self.visitFunctionCode(ctxObj)
 
