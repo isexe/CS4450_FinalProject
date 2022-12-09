@@ -29,8 +29,9 @@ TODO need to allow for nested blocks
 to do this will need to figure out how to track indents
 */
 
+
 functionDef
-  : DEF functionID '(' (paramID (',' paramID)*)? '):' EOL
+  : DEF functionID ( '(' paramID (',' paramID)* '):' | '():' ) EOL
       ((TAB line)+
       | TAB functionReturn EOL)
   ;
@@ -43,6 +44,14 @@ functionCall
 functionReturn
     : RETURN returnVal
     ;
+
+// TODO
+// genericVal
+//     : VAR
+//     | ATOM
+//     | functionCall
+//     | equation 
+//     ;
 
 returnVal
     : VAR
