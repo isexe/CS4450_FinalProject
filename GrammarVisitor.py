@@ -58,6 +58,8 @@ class GrammarVisitor(ProjectVisitor):
     # Will direct to visit parse rule
     # i.e. 1 + 1 will go to visitEquation next
     def visitStatement(self, ctx:ProjectParser.StatementContext):
+        # need to catch return here
+        
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by ProjectParser#equation.
