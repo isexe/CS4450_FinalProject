@@ -975,13 +975,6 @@ class FunctionCallVisitor(GrammarVisitor):
             else:
                 result = self.visitFunctionCode()
                 return result
-        
-
-    def visitFunctionID(self, ctx: ProjectParser.FunctionIDContext):
-        return
-
-    def visitParamVal(self, ctx: ProjectParser.ParamValContext):
-        return
 
 # will count and return the num of tabs
 # if error returns -1
