@@ -102,6 +102,10 @@ class GrammarVisitor(ProjectVisitor):
 
         return result
     
+    # TODO need to implement a generic visitor to handle all the different Val parse rules and combine into one rule
+    # def visitGenericVal(self, ctx: ProjectParser.GenericValContent):
+    #     pass
+    
     # def visitIndent(self, ctx: ProjectParser.IndentContext):
     #     tabArr = ctx.TAB()
         
