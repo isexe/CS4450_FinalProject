@@ -20,22 +20,22 @@ In this project, we are implementing a parser for a language similar to Python u
 Python
 
 ## Requirements
-The latest version of Java and JDK
-Latest version of Python
-ANTLR installed both the package and the Python Module
+The latest version of Java and JDK   
+Latest version of Python   
+ANTLR installed both the package and the Python Module   
 Terminal
 
 ## How to Use (need to add more)
 
 1. Copy antlr-4.9.3-complete.jar in C:\Program Files\Java\libs (or wherever you prefer)
 2. Append the location of ANTLR to the CLASSPATH variable on your system, or create a CLASSPATH variable if you have not done so before
-3. Run the following commands
-  java org.antlr.v4.Tool %* 
-  java org.antlr.v4.gui.TestRig %*
+3. Run the following commands    
+  java org.antlr.v4.Tool %*    
+  java org.antlr.v4.gui.TestRig %*   
 
-Run the following in your python terminal
-  antlr4 -Dlanguage=Python3 Chat.g4
-  pip install antlr4-python3-runtime
+Run the following in your python terminal   
+  antlr4 -Dlanguage=Python3 Chat.g4   
+  pip install antlr4-python3-runtime   
 
 ## GitHub Repository
 
