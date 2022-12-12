@@ -39,7 +39,7 @@ Python
 	* The Java sdk version we used was 19.0.1
 	* The antlr version we used was 4.11.1
 	* The python3 version we used was 3.9.13
-	* The antlr4.runtime version
+	* The antlr4.runtime version was 4.6.6
 
 2. Parser Set up
     * Java SDK + Antlr library
