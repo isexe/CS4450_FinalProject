@@ -32,3 +32,48 @@ Python
 5. <https://stackoverflow.com/questions/9726620/how-can-i-differentiate-between-reserved-words-and-variables-using-antlr>
 6. <https://stackoverflow.com/questions/34368305/antlr-calculator-with-negative-numbers-support>
  
+
+## Enviornment and set up
+
+1. Requirements
+	* The Java sdk version we used was 19.0.1
+	* The antlr version we used was 4.11.1
+	* The python3 version we used was 3.9.13
+	* antlr4.runtime version
+
+2. Parser Set up
+    * Java SDK + Antlr library
+	* Python3 + Antlr4.runtime
+	* Aliases/Commands required for building language
+
+3. Miscelaneous Infor
+	* In the contruction of our parser, we used visitors instead of listeners
+	* python file layout
+	* debugging flag
+
+## Checkpoints and Deliverables
+
+Should discuss what was required, how it was achieved, etc
+
+1. Deliverable #1: Arithmetic/Assignment Operators and Variable defenitions
+	* arithmetic
+	* variables
+	* assignment
+
+2. Deliverable #2: if/else Blocks and Conditional Statements
+	* if/else blocks
+	* conditional statements
+
+3. Deliverables #3
+	* loops
+	* comments
+
+4. Deliverables #4
+	* function implementations
+	* function calls
+
+5. Parse tree images
+    * Deliverable #1 had a 
+    * Deliverable #2 had a 
+    * Deliverable #3 had a 
+    * Deliverable #4 had a 
