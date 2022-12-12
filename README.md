@@ -39,15 +39,20 @@ Python
 	* The Java sdk version we used was 19.0.1
 	* The antlr version we used was 4.11.1
 	* The python3 version we used was 3.9.13
-	* antlr4.runtime version
+	* The antlr4.runtime version
 
 2. Parser Set up
     * Java SDK + Antlr library
 	* Python3 + Antlr4.runtime
 	* Aliases/Commands required for building language
+        * The Aliases were needed for the parser to fild the required antlr files on our devices
+            * Those aliases being something like: 
+        * The command for building the parser language was [antlr4 -Dlanguage=Python3 -visitor Project.g4 -o Grammar]
+        * The command for running our language ofter building it was [python3 Project.py --debugging=True] with the added debugging we used for our tests
+            * Although since our testing phase is over the command would jst be [python3 Project.py]
 
-3. Miscelaneous Infor
-	* In the contruction of our parser, we used visitors instead of listeners
+3. Miscelaneous Information
+	* In the construction of our parser, we used visitors instead of listeners
 	* python file layout
 	* debugging flag
 
@@ -56,21 +61,25 @@ Python
 Should discuss what was required, how it was achieved, etc
 
 1. Deliverable #1: Arithmetic/Assignment Operators and Variable defenitions
-	* arithmetic
-	* variables
-	* assignment
+	* Arithmetic Operators
+	* Variables Operators
+	* Assignment definitions
 
 2. Deliverable #2: if/else Blocks and Conditional Statements
-	* if/else blocks
-	* conditional statements
+	* if/else Blocks
+	* Conditional Statements
 
-3. Deliverables #3
-	* loops
-	* comments
+3. Deliverables #3: for/while Loops and comments
+	* for Loops
+        * 
+    * while Loops
+        * Programming the while loops wasn't all that complicated. It mostly consisted of relatively the same logic behind if statement grammar visitor code, only this time the code block would repeat unless the conditional statement was false.
+	* Comments
+        * 
 
-4. Deliverables #4
-	* function implementations
-	* function calls
+4. Deliverables #4: Function Definitions and Calls
+	* Function Implementations
+	* Function Calls
 
 5. Parse tree images
     * Deliverable #1 had a 
