@@ -15,8 +15,6 @@ def main(argv):
     except:
         debug = False
 
-    debug = True
-
     # command-line formatting
     print("pȳthon 0.0.1")
     print("Type Ctrl+D to run, Ctrl+Z to exit")

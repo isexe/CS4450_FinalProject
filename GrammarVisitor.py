@@ -164,8 +164,6 @@ class GrammarVisitor(ProjectVisitor):
         tabArr = ctx.TAB()
         
         count = countTabs(tabArr)
-        
-        print(count)
 
         # indent by 1
         if(count <= getIndent() + 1):
@@ -173,9 +171,6 @@ class GrammarVisitor(ProjectVisitor):
         elif(count > getIndent() + 1):
             # need to throw error
             raise IndentationError("unexpected indent")
-        
-        if(self.debugging and currIndent != getIndent()):
-            print("Indent: " + str(getIndent()))
         
         return super().visitIndent(ctx)
 
