@@ -98,17 +98,18 @@ Conditional statements support logic operators and conjunctions.  It was impleme
 If/Else blocks support a single if statement, followed by any number of optional elif statements, followed by an optional else statement.  It was implemented as a mixture of parser and lexer rules.  The main rule is the ifBlseBlock parser rule.  A visitor class called visitIfElseBlock was used to interpret the parse tree.  It would start by interpreting the ifStatement rule, if the logicExpr in it returned true, it would perform the code in the ifElse code block.  If it wasn't true, the visitor would continue to look through the ifElseBlock's children until one of them returns true, meaning it ran its code.  If no statement returns true, the elseStatement is performed.
 
 3. Deliverables #3: for/while Loops and comments
-	* for Loops
-        * 
-    * while Loops
-        * Programming the while loops wasn't all that complicated. It mostly consisted of relatively the same logic behind if statement Grammar visitor code, only this time the code block would repeat unless the conditional statement was false.
-	* Comments
+
+For loops were similiar to while loops in the sense that the actual looping part of the code was relatively easy to implement. The main differences from a while loop were having to implement the range function, which had to be able to handle 1, 2, and 3 parameters to cover all of the different cases and contexts in which the range funciton can be used. We also had to make sure that we were properly defining the loop variable that is in the definintion on the loop.
+
+Programming the while loops wasn't all that complicated. It mostly consisted of relatively the same logic behind if statement Grammar visitor code, only this time the code block would repeat unless the conditional statement was false.
 
 Comments support inline comments only since Python only supports those.  Comments have a lexer rule that states any characters that follow a # are skipped.  Currently, only certain characters such as alphanumerical and popular punctuations are supported so in the future this could be improved to include all possible UTF-8 characters.
 
 4. Deliverables #4: Function Definitions and Calls
-	* Function Implementations
-	* Function Calls
+
+In python, functions are stored as variables, so we wanted to keep that implementation the same in our parser. Our function definition function finds all of the parameters in the function defintion passed to it from the user and stores them in an array. It then takes that array and the ctx.FunctionCode and stores that in an object that can then be stored in the variable dictionary, with the key being the name of the function
+
+Our function calls work by getting the object stored in the variable dictionary and making a local copy of it that can be used to turn all of the parameter names into variable themselves that can be used to run the code stored within the function
 
 5. Parse tree images
 
